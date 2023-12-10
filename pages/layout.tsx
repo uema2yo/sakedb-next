@@ -19,7 +19,7 @@ export default function Layout({ children }: { children: ReactNode }) {
     setId(id);
     setTitle(title);
     setSlot(slot);
-    dialogRef.current?.toggleDialog();
+    dialogRef.current?.openDialog();
   };
 
   return (

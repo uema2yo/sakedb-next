@@ -14,18 +14,23 @@ type DialogProps = {
 
 export interface DialogComponentHandle {
   toggleDialog: () => void;
+  openDialog: () => void;
+  closeDialog: () => void;
 }
 
 const Dialog = forwardRef<DialogComponentHandle, DialogProps>(({ id, title, slot }, ref) => {
   const [open, setOpen] = useState(false);
   useImperativeHandle(ref, () => ({
     toggleDialog,
+    openDialog,
     closeDialog
   }));
   const openRef = useRef(null);
   const toggleDialog = () => {
-    console.log(toggleDialog)
     setOpen(!open);
+  }
+  const openDialog = () => {
+    setOpen(true);
   }
   const closeDialog = () => {
     setOpen(false);

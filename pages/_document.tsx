@@ -1,4 +1,3 @@
-import { ReactNode, useState, useRef } from "react";
 import { Html, Head, Main, NextScript } from "next/document";
 
 const MyDocument = () => {
@@ -12,7 +11,7 @@ const MyDocument = () => {
       </Head>
       <body className="my-custom-class">
         <Main />
-       <NextScript />
+        <NextScript />
       </body>
     </Html>
   );
