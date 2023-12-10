@@ -24,6 +24,7 @@ const Dialog = forwardRef<DialogComponentHandle, DialogProps>(({ id, title, slot
   }));
   const openRef = useRef(null);
   const toggleDialog = () => {
+    console.log(toggleDialog)
     setOpen(!open);
   }
   const closeDialog = () => {

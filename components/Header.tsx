@@ -1,7 +1,7 @@
 import React, { ReactNode, FC } from "react";
-import { SITE_TITLE } from "@app/constants";
-import Login from "@/app/components/Form/Login";
-import EmailForSignup from "@/app/components/Form/EmailForSignup";
+import { SITE_TITLE } from "@constants";
+import Login from "@components/Form/Login";
+import EmailForSignup from "@components/Form/EmailForSignup";
 
 type ClickProps = {
   onDialogToggleButtonClick: (

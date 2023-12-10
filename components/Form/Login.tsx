@@ -15,7 +15,7 @@ const Login = () => {
   const [password, setPassword] = useState("");
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const router = useRouter();
-  const currentPath = usePathname();
+  const currentPath = usePathname() || "";
   const redirectPath = currentPath === "/login" ? "/mypage" : currentPath;
   
   useEffect(() => {

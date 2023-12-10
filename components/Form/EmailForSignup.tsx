@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import Router from 'next/router'
 import { auth } from "@lib/firebase/init";
 import { sendSignInLinkToEmail } from "firebase/auth";
-import { DOMAIN, LOCAL_DOMAIN } from "@app/constants";
+import { DOMAIN, LOCAL_DOMAIN } from "@constants";
 
 const EmailForSignup = () => {
   const [email, setEmail] = useState("");

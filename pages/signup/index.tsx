@@ -1,13 +1,18 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { auth } from "@lib/firebase/init";
 import { createUserWithEmailAndPassword } from "firebase/auth";
 
 const Signup = () => {
   const [password, setPassword] = useState("");
+  const [email, setEmail] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const email = window.localStorage.getItem("emailForSignup");
+  //const email = window.localStorage.getItem("emailForSignup");
+
+  useEffect(() => {
+    setEmail(window.localStorage.getItem("emailForSignup") || "");
+  });
 
   const handleSignup = async () => {
     if (password !== confirmPassword) {

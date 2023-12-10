@@ -1,4 +1,4 @@
-import { SITE_TITLE } from "@app/constants";
+import { SITE_TITLE } from "@constants";
 
 const Footer = () => {
   return (
