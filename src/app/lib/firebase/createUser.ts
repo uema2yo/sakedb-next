@@ -1,4 +1,4 @@
-import { SITE_URL } from "../../constants";
+import { DOMAIN } from "../../constants";
 import { createUserWithEmailAndPassword, sendEmailVerification } from "firebase/auth";
 import type { ActionCodeSettings } from "firebase/auth";
 import { auth, db } from "@lib/firebase/init";
@@ -18,7 +18,7 @@ export async function createUser(
 		if (user) {
 			const target_page = currentPath !== "/register" ? currentPath : "/mypage";
 			const actionCodeSettings: ActionCodeSettings = {
-				url: SITE_URL + target_page,
+				url: DOMAIN + target_page,
 				handleCodeInApp: false
 			};
 			await sendEmailVerification(user, actionCodeSettings);

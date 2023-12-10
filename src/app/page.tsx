@@ -1,14 +1,9 @@
 import Image from 'next/image'
 import styles from './page.module.css'
 
-import Login from '@/app/components/Form/Signin';
-import EmailForSignup from '@/app/components/Form/EmailForSignup';
-
 export default function Home() {
   return (
     <main className={styles.main}>
-      <Login />
-      <EmailForSignup />
       <div className={styles.description}>
         <p>
           Get started by editing&nbsp;
