@@ -1,7 +1,7 @@
 import Layout from "@layout"
-const Index = () => {
+const Index = (loginInfo: { uid: string; user: boolean; admin: boolean; status: number; } | null) => {
   return(
-    <Layout>
+    <Layout loginInfo={loginInfo}>
     home
     </Layout>  
   )

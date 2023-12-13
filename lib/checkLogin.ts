@@ -3,11 +3,11 @@ import { onAuthStateChanged } from "firebase/auth";
 import type { Unsubscribe } from "firebase/auth";
 import { doc, getDoc } from "firebase/firestore";
 
-export const login: { uid: string; user: boolean; admin: boolean; status: number } = {
+export const loginInfo: { uid: string; user: boolean; admin: boolean; status: number } = {
 	uid: "",
 	user: false,
 	admin: false,
-	status: 0
+	status: 0 
 };
 
 export function checkLogin(): Promise<void> {
@@ -22,9 +22,9 @@ export function checkLogin(): Promise<void> {
 					const userDoc = doc(db, "m_user", firebaseUser.uid);
 					const userSnap = await getDoc(userDoc);
 					const userExists = userSnap.exists();
-					login.uid = firebaseUser.uid;
-					login.user = userExists;
-					login.admin = userExists && Boolean(userSnap.data()?.admin);
+					loginInfo.uid = firebaseUser.uid;
+					loginInfo.user = userExists;
+					loginInfo.admin = userExists && Boolean(userSnap.data()?.admin);
 				}
 			} catch (error) {
 				reject(error);

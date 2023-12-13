@@ -2,17 +2,22 @@
 
 import { ReactNode, useState } from "react";
 import { useRef, useEffect } from "react";
-import { checkLogin, login } from "@lib/checkLogin";
+//import { checkLogin, loginInfo } from "@lib/checkLogin";
 import Header from "@components/Header";
 import Footer from "@components/Footer";
 import Dialog, { DialogComponentHandle } from "@components/Dialog";
 
 type LayoutProps = {
   children: ReactNode;
-  logout?: boolean;
+  loginInfo: {
+    uid: string;
+    user: boolean;
+    admin: boolean;
+    status: number;
+  } | null;
 };
 
-const Layout = ({ children, logout = true }: LayoutProps) => {
+const Layout = ({ children, loginInfo }: LayoutProps) => {
   const [id, setId] = useState("");
   const [title, setTitle] = useState("");
   const [slot, setSlot] = useState<ReactNode>();
@@ -28,27 +33,12 @@ const Layout = ({ children, logout = true }: LayoutProps) => {
     setSlot(slot);
     dialogRef.current?.openDialog();
   };
-  useEffect(() => {
-    (async () => {
-      try {
-        await checkLogin();
-        console.log("login", login);
-        setLoading(false);
-      } catch (error) {
-        console.error(
-          "An error occurred while checking the login status:",
-          error
-        );
-      }
-    })();
-  }, []);
-
   return (
     <>
-      !!
-      {logout && (
-        <Header onDialogToggleButtonClick={handleDialogToggleButtonClick} />
-      )}
+      <Header
+        onDialogToggleButtonClick={handleDialogToggleButtonClick}
+        loginInfo={loginInfo}
+      />
       {children}
       <Footer />
       <Dialog ref={dialogRef} id={id} title={title} slot={slot} />

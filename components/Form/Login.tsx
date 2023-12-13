@@ -1,7 +1,6 @@
-'use client';
-
+"use client";
 import { useState, useEffect, FormEvent } from "react";
-import { usePathname, useRouter } from 'next/navigation';
+import { usePathname, useRouter } from "next/navigation";
 import { auth } from "@lib/firebase/init";
 import {
   onAuthStateChanged,
@@ -17,7 +16,7 @@ const Login = () => {
   const router = useRouter();
   const currentPath = usePathname() || "";
   const redirectPath = currentPath === "/login" ? "/mypage" : currentPath;
-  
+
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       setIsLoggedIn(!!user);
@@ -43,21 +42,24 @@ const Login = () => {
   };
 
   return (
-    <form onSubmit={login}>
-      <input
-        type='email'
-        value={email}
-        onChange={(event) => setEmail(event.target.value)}
-        placeholder='E メール'
-      />
-      <input
-        type='password'
-        value={password}
-        onChange={(event) => setPassword(event.target.value)}
-        placeholder='パスワード'
-      />
-      <button type='submit'>Login</button>
-    </form>
+    <>
+      <p>ご登録いただいた方法でログインしてください。</p>
+      <form onSubmit={login}>
+        <input
+          type="email"
+          value={email}
+          onChange={(event) => setEmail(event.target.value)}
+          placeholder="E メール"
+        />
+        <input
+          type="password"
+          value={password}
+          onChange={(event) => setPassword(event.target.value)}
+          placeholder="パスワード"
+        />
+        <button type="submit">ログイン</button>
+      </form>
+    </>
   );
 };
 
