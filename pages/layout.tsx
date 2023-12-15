@@ -1,27 +1,22 @@
 "use client";
 
-import { ReactNode, useState } from "react";
+import { ReactNode, useState, FC } from "react";
 import { useRef, useEffect } from "react";
-//import { checkLogin, loginInfo } from "@lib/checkLogin";
+import type { LoginInfoProps } from "@lib/checkLogin";
 import Header from "@components/Header";
 import Footer from "@components/Footer";
 import Dialog, { DialogComponentHandle } from "@components/Dialog";
 
-type LayoutProps = {
+interface LayoutProps {
   children: ReactNode;
-  loginInfo: {
-    uid: string;
-    user: boolean;
-    admin: boolean;
-    status: number;
-  } | null;
-};
+  loginInfo: LoginInfoProps;
+  loginLoading: boolean;
+}
 
-const Layout = ({ children, loginInfo }: LayoutProps) => {
+const Layout: FC<LayoutProps> = ({ children, loginInfo, loginLoading }) => {
   const [id, setId] = useState("");
   const [title, setTitle] = useState("");
   const [slot, setSlot] = useState<ReactNode>();
-  const [laoding, setLoading] = useState(true);
   const dialogRef = useRef<DialogComponentHandle>(null);
   const handleDialogToggleButtonClick = (
     id: string,
@@ -33,11 +28,13 @@ const Layout = ({ children, loginInfo }: LayoutProps) => {
     setSlot(slot);
     dialogRef.current?.openDialog();
   };
+
   return (
     <>
       <Header
         onDialogToggleButtonClick={handleDialogToggleButtonClick}
         loginInfo={loginInfo}
+        loginLoading={loginLoading}
       />
       {children}
       <Footer />

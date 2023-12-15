@@ -3,6 +3,7 @@ import { SITE_TITLE } from "@constants";
 import Login from "@components/Form/Login";
 import Logout from "@components/Form/Logout";
 import EmailForSignup from "@components/Form/EmailForSignup";
+import Loading from "@components/Loading";
 
 type HeaderProps = {
   onDialogToggleButtonClick: (
@@ -16,16 +17,20 @@ type HeaderProps = {
     admin: boolean;
     status: number;
   } | null;
+  loginLoading: boolean;
 };
 
 const Header: FC<HeaderProps> = ({
   onDialogToggleButtonClick,
-  loginInfo = null,
+  loginInfo,
+  loginLoading,
 }) => {
   return (
     <header>
       <h1>{SITE_TITLE}</h1>
-      {loginInfo?.uid ? (
+      {loginLoading ? (
+        <Loading />
+      ) : loginInfo?.uid ? (
         <button
           onClick={() =>
             onDialogToggleButtonClick("logout", "ログアウト", <Logout />)

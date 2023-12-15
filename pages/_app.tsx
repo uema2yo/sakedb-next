@@ -1,16 +1,27 @@
-import { useState, useEffect } from "react";
-import type { AppProps } from 'next/app';
-import { NextPage } from 'next';
-import { checkLogin, loginInfo } from "@lib/checkLogin";
+import { useState, useEffect, ReactNode } from "react";
+import type { AppProps } from "next/app";
+import { NextPage } from "next";
+import { checkLogin, loginInfo, LoginInfoProps } from "@lib/checkLogin";
 import "@styles/common.scss";
 
-const MyApp: NextPage<AppProps> = ({ Component, pageProps }: AppProps)  => {
-  const [loginInfoProps, setLoginInfoProps] = useState({});
+const MyApp: NextPage<AppProps> = ({
+  Component,
+  pageProps,
+  router,
+}: AppProps) => {
+  const [loginInfoProp, setLoginInfoProp] = useState<LoginInfoProps>(loginInfo);
+  const [loginLoading, setLoginLoading] = useState(true);
+  const additionalProps = {
+    loginInfo: loginInfoProp,
+    loginLoading: loginLoading,
+  };
+
   useEffect(() => {
     (async () => {
       try {
         await checkLogin();
-        setLoginInfoProps(loginInfo);
+        setLoginInfoProp(loginInfo);
+        setLoginLoading(false);
       } catch (error) {
         console.error(
           "An error occurred while checking the login status:",
@@ -18,10 +29,9 @@ const MyApp: NextPage<AppProps> = ({ Component, pageProps }: AppProps)  => {
         );
       }
     })();
-  }, []);
+  }, [router.pathname]);
 
-  return (
-    <Component {...pageProps} loginInfo={loginInfoProps} />
-  )
-}
+  return <Component {...pageProps} {...additionalProps} />;
+};
+
 export default MyApp;

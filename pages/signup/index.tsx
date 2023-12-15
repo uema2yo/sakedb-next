@@ -6,12 +6,20 @@ import { auth } from "@lib/firebase/init";
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import Layout from "@layout";
 
-const Signup = (loginInfo: { uid: string; user: boolean; admin: boolean; status: number; } | null) => {
+import type { LoginInfoProps } from "@lib/checkLogin";
+
+interface Props {
+  loginInfo: LoginInfoProps;
+  loginLoading: boolean;
+}
+
+const Signup = (props: Props) => {
   const [userId, setUserId] = useState("");
   const [password, setPassword] = useState("");
   const [email, setEmail] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const router = useRouter();
+  const { loginInfo, loginLoading } = props;
 
   useEffect(() => {
     setEmail(window.localStorage.getItem("emailForSignup") || "");
@@ -37,7 +45,7 @@ const Signup = (loginInfo: { uid: string; user: boolean; admin: boolean; status:
   };
 
   return (
-    <Layout loginInfo={loginInfo} >
+    <Layout loginInfo={loginInfo} loginLoading={loginLoading} >
       <div >
         <p>
           ユーザー ID とパスワードを設定してください。（※ ユーザー ID

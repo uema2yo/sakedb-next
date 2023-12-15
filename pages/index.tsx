@@ -1,10 +1,19 @@
-import Layout from "@layout"
-const Index = (loginInfo: { uid: string; user: boolean; admin: boolean; status: number; } | null) => {
-  return(
-    <Layout loginInfo={loginInfo}>
-    home
-    </Layout>  
-  )
+import type { LoginInfoProps } from "@lib/checkLogin";
+import Layout from "@layout";
+
+interface Props {
+  loginInfo: LoginInfoProps;
+  loginLoading: boolean;
 }
+
+const Index = (props: Props) => {
+  const { loginInfo, loginLoading } = props;
+
+  return (
+    <Layout loginInfo={loginInfo} loginLoading={loginLoading}>
+      home
+    </Layout>
+  );
+};
 
 export default Index;
