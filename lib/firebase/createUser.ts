@@ -1,4 +1,4 @@
-import { DOMAIN } from "../../constants";
+import { DOMAIN } from "@constants";
 import { createUserWithEmailAndPassword, sendEmailVerification } from "firebase/auth";
 import type { ActionCodeSettings } from "firebase/auth";
 import { auth, db } from "@lib/firebase/init";
@@ -16,12 +16,11 @@ export async function createUser(
 		const userCredential = await createUserWithEmailAndPassword(auth, email, password);
 		const user = userCredential.user;
 		if (user) {
-			const target_page = currentPath !== "/register" ? currentPath : "/mypage";
+			const target_page = currentPath !== "/signup" ? currentPath : "/mypage";
 			const actionCodeSettings: ActionCodeSettings = {
 				url: DOMAIN + target_page,
 				handleCodeInApp: false
 			};
-			await sendEmailVerification(user, actionCodeSettings);
 			await setDoc(doc(db, "m_user", user.uid), {
 				//uid を一致させるために m_user は setDoc を使う。
 				uid: user.uid,

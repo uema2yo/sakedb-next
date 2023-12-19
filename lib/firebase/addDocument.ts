@@ -1,6 +1,6 @@
 import { db } from "@lib/firebase/init";
 import { collection, addDoc } from "firebase/firestore";
-import { checkLogin, login } from "@lib/checkLogin";
+import { checkLogin, loginInfo } from "@lib/checkLogin";
 
 export async function addDocument(
 	collectionName: string,
@@ -8,7 +8,7 @@ export async function addDocument(
 ) {
 	try {
 		await checkLogin();
-		const uid = login.uid;
+		const uid = loginInfo.uid;
 		const timestamp = new Date().getTime();
 		document["timestamp"] = timestamp;
 		document["uid"] = uid;

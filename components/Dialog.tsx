@@ -6,7 +6,7 @@ import React, {
   ReactNode,
 } from "react";
 
-type DialogProps = {
+interface DialogProps {
   id?: string;
   title?: string;
   slot?: ReactNode;

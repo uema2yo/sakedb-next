@@ -3,7 +3,7 @@ import { onAuthStateChanged } from "firebase/auth";
 import type { Unsubscribe } from "firebase/auth";
 import { doc, getDoc } from "firebase/firestore";
 
-export type LoginInfoProps = {
+export interface LoginInfoProps {
   uid: string;
   user: boolean;
   admin: boolean;

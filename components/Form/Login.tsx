@@ -1,6 +1,6 @@
 "use client";
 import { useState, useEffect, FormEvent } from "react";
-import { usePathname, useRouter } from "next/navigation";
+import { useRouter } from "next/router";
 import { auth } from "@lib/firebase/init";
 import {
   onAuthStateChanged,
@@ -12,29 +12,22 @@ import {
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const router = useRouter();
-  const currentPath = usePathname() || "";
-  const redirectPath = currentPath === "/login" ? "/mypage" : currentPath;
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
-      setIsLoggedIn(!!user);
       if (user) {
-        router.push(redirectPath);
+        router.reload();
       }
     });
     return () => unsubscribe();
-  }, [auth, redirectPath]);
+  }, []);
 
   const login = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setPersistence(auth, browserSessionPersistence)
       .then(() => {
         return signInWithEmailAndPassword(auth, email, password);
-      })
-      .then(() => {
-        router.push(redirectPath);
       })
       .catch((error) => {
         console.error("Error signing in", error);
