@@ -17,7 +17,7 @@ interface Condition {
 }
 
 interface CollectionConfig {
-	collectionName?: string;
+	collectionName: string;
 	conditions?: Condition[];
 	public_only?: boolean;
 	order_by?: {

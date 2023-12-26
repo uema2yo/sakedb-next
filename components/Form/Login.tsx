@@ -21,7 +21,7 @@ const Login = () => {
       }
     });
     return () => unsubscribe();
-  }, []);
+  }, [router]);
 
   const login = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();

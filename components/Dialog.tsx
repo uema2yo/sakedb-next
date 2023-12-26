@@ -43,4 +43,5 @@ const Dialog = forwardRef<DialogComponentHandle, DialogProps>(({ id, title, slot
   </dialog>
   );
 });
+Dialog.displayName = "Dialog";
 export default Dialog;

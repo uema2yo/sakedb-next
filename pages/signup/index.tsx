@@ -25,7 +25,7 @@ const Signup = (props: Props) => {
 
   useEffect(() => {
     setEmail(window.localStorage.getItem("emailForSignup") || "");
-  });
+  },[]);
 
   const addUserAccount = async (user: User) => {
     const currentPath = window.location.pathname;
@@ -62,8 +62,9 @@ const Signup = (props: Props) => {
 
     try {
       if (email) {
+        console.log(auth, email, password)
         const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-        addUserAccount(userCredential.user);
+        await addUserAccount(userCredential.user);
         // 登録成功後の処理
         router.push("/mypage");
       } else {

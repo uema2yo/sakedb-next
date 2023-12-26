@@ -1,6 +1,6 @@
 import { db } from "@lib/firebase/init";
 import { doc, updateDoc } from "firebase/firestore";
-import { checkLogin, login } from "@lib/checkLogin";
+import { checkLogin, loginInfo } from "@lib/checkLogin";
 
 export async function updateDocument(
   collection_name: string,
@@ -9,7 +9,7 @@ export async function updateDocument(
 ) {
   try {
     await checkLogin();
-    const uid = login.uid;
+    const uid = loginInfo.uid;
     const documentRef = doc(db, collection_name, documentId);
     const timestamp = new Date().getTime();
     const updatedDocument = {
