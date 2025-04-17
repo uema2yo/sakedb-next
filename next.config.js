@@ -1,4 +1,2 @@
 /** @type {import('next').NextConfig} */
-const nextConfig = {}
-
-module.exports = nextConfig
+export const target = process.env.NODE_ENV === 'production' ? 'serverless' : 'server';

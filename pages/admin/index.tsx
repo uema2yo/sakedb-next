@@ -5,8 +5,8 @@ import { useRouter } from "next/router";
 import { auth, db } from "@lib/firebase/init";
 import { addDocument } from "@lib/firebase/addDocument";
 import { getDocuments } from "@lib/firebase/getDocuments";
-import { updateRegionCodes } from "@lib/code/updateRegionCodes";
-import { updateCountryCodes } from "@lib/code/updateCountryCodes";
+// import { updateRegionCodes } from "@lib/code/updateRegionCodes";
+// import { updateCountryCodes } from "@lib/code/updateCountryCodes";
 import { updatePrefectureCodes } from "@lib/code/updatePrefectureCodes";
 import { updateCityCodes } from "@lib/code/updateCityCodes";
 import type { LoginInfoProps } from "@lib/checkLogin";
@@ -21,12 +21,12 @@ interface Props {
 const apiImportHandler: MouseEventHandler<HTMLButtonElement> = async (e) => {
   const target = e.target as HTMLButtonElement;
   switch (target.name) {
-    case "updateRegionCodes":
-      await updateRegionCodes();
-      break;
-    case "updateCountryCodes":
-      await updateCountryCodes();
-      break;
+    // case "updateRegionCodes":
+      // await updateRegionCodes();
+      // break;
+    // case "updateCountryCodes":
+      // await updateCountryCodes();
+      // break;
     case "updatePrefectureCodes":
       updatePrefectureCodes();
       break;
@@ -95,6 +95,7 @@ const Admin = (props: Props) => {
 
         {admin && (
           <>
+          {/*
             <article>
               <h2>地域コード</h2>
               <button
@@ -102,7 +103,7 @@ const Admin = (props: Props) => {
                 name="updateRegionCodes"
                 onClick={apiImportHandler}
               >
-                RESAS API で上書きする
+                REST Countries API で上書きする
               </button>
               <button
                 type="button"
@@ -120,7 +121,7 @@ const Admin = (props: Props) => {
                 name="updateCountryCodes"
                 onClick={apiImportHandler}
               >
-                RESAS API で上書きする
+                REST Countries API で上書きする
               </button>
               <button
                 type="button"
@@ -131,6 +132,7 @@ const Admin = (props: Props) => {
                 手動編集画面を開く
               </button>
             </article>
+            */}
             <article>
               <h2>都道府県コード</h2>
               <button
@@ -138,7 +140,7 @@ const Admin = (props: Props) => {
                 name="updatePrefectureCodes"
                 onClick={apiImportHandler}
               >
-                RESAS API で上書きする
+                MLIT DATA API で上書きする
               </button>
               <button
                 type="button"
@@ -156,7 +158,7 @@ const Admin = (props: Props) => {
                 name="updateCityCodes"
                 onClick={apiImportHandler}
               >
-                RESAS API で上書きする
+                MLIT DATA API で上書きする
               </button>
               <button
                 type="button"

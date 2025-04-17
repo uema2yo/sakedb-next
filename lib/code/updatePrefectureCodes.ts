@@ -1,34 +1,27 @@
 import { updateCodes } from "@lib/code/updateCodes";
 import { DOMESTIC_REGION_CODES } from "@constants";
 
-const fetchOptions: RequestInit = {};
-if (process.env.NEXT_PUBLIC_RESAS_API_KEY) {
-  fetchOptions.headers = { "X-API-KEY": process.env.NEXT_PUBLIC_RESAS_API_KEY };
-}
+const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
 
 export async function updatePrefectureCodes() {
+  const prefectureCodes: {
+    code: string | number;
+    label: string;
+    domasticRegionCode: number;
+  }[] = [];
+
   try {
-    const prefecture = await fetch(
-      "https://opendata.resas-portal.go.jp/api/v1/prefectures",
-      fetchOptions
-    );
+    const prefecture = await fetch(`${baseUrl}/api/prefecture`);
+    const prefectures = await prefecture.json();
 
-    const prefectureCodes: {
-      code: string | number;
-      label: string;
-      domasticRegionCode: number;
-    }[] = [];
-
-    const res = await prefecture.json();
-
-    res.result.forEach((r: { prefCode: number; prefName: string }) => {
+    prefectures.forEach((r: { code: number; name: string }) => {
 			// ハードコーディングした地方コードを反映させる
       const domesticRegionCode = DOMESTIC_REGION_CODES.filter(
-        (domesticRegion) => domesticRegion.prefectureCodes.includes(r.prefCode)
+        (domesticRegion) => domesticRegion.prefectureCodes.includes(r.code)
       )[0].code;
       prefectureCodes.push({
-        code: r.prefCode,
-        label: r.prefName,
+        code: r.code,
+        label: r.name,
         domasticRegionCode: domesticRegionCode,
       });
     });

@@ -1,0 +1,302 @@
+[
+  {
+    "order": "01",
+    "code": "002",
+    "name": {
+      "eng": "Africa",
+      "jpn": "アフリカ",
+      "fra": "Afrique",
+      "spa": "África",
+      "zho": "非洲",
+      "kor": "아프리카"
+    }
+  },
+  {
+    "order": "02",
+    "code": "019",
+    "name": {
+      "eng": "Americas",
+      "jpn": "アメリカ大陸",
+      "fra": "Amériques",
+      "spa": "Américas",
+      "zho": "美洲",
+      "kor": "아메리카"
+    }
+  },
+  {
+    "order": "03",
+    "code": "010",
+    "name": {
+      "eng": "Antarctica",
+      "jpn": "南極",
+      "fra": "Antarctique",
+      "spa": "Antártida",
+      "zho": "南极洲",
+      "kor": "남극"
+    }
+  },
+  {
+    "order": "04",
+    "code": "053",
+    "name": {
+      "eng": "Australia and New Zealand",
+      "jpn": "オーストラリアおよびニュージーランド",
+      "fra": "Australie et Nouvelle-Zélande",
+      "spa": "Australia y Nueva Zelanda",
+      "zho": "澳新地区",
+      "kor": "오스트레일리아 및 뉴질랜드"
+    }
+  },
+  {
+    "order": "05",
+    "code": "029",
+    "name": {
+      "eng": "Caribbean",
+      "jpn": "カリブ",
+      "fra": "Caraïbes",
+      "spa": "Caribe",
+      "zho": "加勒比地区",
+      "kor": "카리브해"
+    }
+  },
+  {
+    "order": "06",
+    "code": "013",
+    "name": {
+      "eng": "Central America",
+      "jpn": "中央アメリカ",
+      "fra": "Amérique centrale",
+      "spa": "América Central",
+      "zho": "中美洲",
+      "kor": "중앙아메리카"
+    }
+  },
+  {
+    "order": "07",
+    "code": "143",
+    "name": {
+      "eng": "Central Asia",
+      "jpn": "中央アジア",
+      "fra": "Asie centrale",
+      "spa": "Asia Central",
+      "zho": "中亚",
+      "kor": "중앙아시아"
+    }
+  },
+  {
+    "order": "08",
+    "code": "014",
+    "name": {
+      "eng": "Eastern Africa",
+      "jpn": "東アフリカ",
+      "fra": "Afrique de l'Est",
+      "spa": "África oriental",
+      "zho": "东非",
+      "kor": "동아프리카"
+    }
+  },
+  {
+    "order": "09",
+    "code": "030",
+    "name": {
+      "eng": "Eastern Asia",
+      "jpn": "東アジア",
+      "fra": "Asie de l'Est",
+      "spa": "Asia Oriental",
+      "zho": "东亚",
+      "kor": "동아시아"
+    }
+  },
+  {
+    "order": "10",
+    "code": "151",
+    "name": {
+      "eng": "Eastern Europe",
+      "jpn": "東ヨーロッパ",
+      "fra": "Europe de l'Est",
+      "spa": "Europa Oriental",
+      "zho": "东欧",
+      "kor": "동유럽"
+    }
+  },
+  {
+    "order": "11",
+    "code": "054",
+    "name": {
+      "eng": "Melanesia",
+      "jpn": "メラネシア",
+      "fra": "Mélanésie",
+      "spa": "Melanesia",
+      "zho": "美拉尼西亚",
+      "kor": "멜라네시아"
+    }
+  },
+  {
+    "order": "12",
+    "code": "057",
+    "name": {
+      "eng": "Micronesia",
+      "jpn": "ミクロネシア",
+      "fra": "Micronésie",
+      "spa": "Micronesia",
+      "zho": "密克罗尼西亚",
+      "kor": "미크로네시아"
+    }
+  },
+  {
+    "order": "13",
+    "code": "017",
+    "name": {
+      "eng": "Middle Africa",
+      "jpn": "中部アフリカ",
+      "fra": "Afrique centrale",
+      "spa": "África central",
+      "zho": "中非",
+      "kor": "중부 아프리카"
+    }
+  },
+  {
+    "order": "14",
+    "code": "015",
+    "name": {
+      "eng": "Northern Africa",
+      "jpn": "北アフリカ",
+      "fra": "Afrique du Nord",
+      "spa": "África del Norte",
+      "zho": "北非",
+      "kor": "북아프リカ"
+    }
+  },
+  {
+    "order": "15",
+    "code": "021",
+    "name": {
+      "eng": "Northern America",
+      "jpn": "北アメリカ",
+      "fra": "Amérique du Nord",
+      "spa": "América del Norte",
+      "zho": "北美洲",
+      "kor": "북아메리카"
+    }
+  },
+  {
+    "order": "16",
+    "code": "154",
+    "name": {
+      "eng": "Northern Europe",
+      "jpn": "北ヨーロッパ",
+      "fra": "Europe du Nord",
+      "spa": "Europa del Norte",
+      "zho": "北欧",
+      "kor": "북유럽"
+    }
+  },
+  {
+    "order": "17",
+    "code": "061",
+    "name": {
+      "eng": "Polynesia",
+      "jpn": "ポリネシア",
+      "fra": "Polynésie",
+      "spa": "Polinesia",
+      "zho": "波利尼西亚",
+      "kor": "폴리네시아"
+    }
+  },
+  {
+    "order": "18",
+    "code": "005",
+    "name": {
+      "eng": "South America",
+      "jpn": "南アメリカ",
+      "fra": "Amérique du Sud",
+      "spa": "América del Sur",
+      "zho": "南美洲",
+      "kor": "남아메리카"
+    }
+  },
+  {
+    "order": "19",
+    "code": "035",
+    "name": {
+      "eng": "South-Eastern Asia",
+      "jpn": "東南アジア",
+      "fra": "Asie du Sud-Est",
+      "spa": "Sudeste Asiático",
+      "zho": "东南亚",
+      "kor": "동남아시아"
+    }
+  },
+  {
+    "order": "20",
+    "code": "018",
+    "name": {
+      "eng": "Southern Africa",
+      "jpn": "南部アフリカ",
+      "fra": "Afrique australe",
+      "spa": "África Meridional",
+      "zho": "南部非洲",
+      "kor": "남부 아프리카"
+    }
+  },
+  {
+    "order": "21",
+    "code": "034",
+    "name": {
+      "eng": "Southern Asia",
+      "jpn": "南アジア",
+      "fra": "Asie du Sud",
+      "spa": "Asia Meridional",
+      "zho": "南亚",
+      "kor": "남아시아"
+    }
+  },
+  {
+    "order": "22",
+    "code": "039",
+    "name": {
+      "eng": "Southern Europe",
+      "jpn": "南ヨーロッパ",
+      "fra": "Europe du Sud",
+      "spa": "Europa del Sur",
+      "zho": "南欧",
+      "kor": "남유럽"
+    }
+  },
+  {
+    "order": "23",
+    "code": "011",
+    "name": {
+      "eng": "Western Africa",
+      "jpn": "西アフリカ",
+      "fra": "Afrique de l'Ouest",
+      "spa": "África Occidental",
+      "zho": "西非",
+      "kor": "서아프リカ"
+    }
+  },
+  {
+    "order": "24",
+    "code": "145",
+    "name": {
+      "eng": "Western Asia",
+      "jpn": "西アジア",
+      "fra": "Asie de l'Ouest",
+      "spa": "Asia Occidental",
+      "zho": "西亚",
+      "kor": "서아시아"
+    }
+  },
+  {
+    "order": "25",
+    "code": "155",
+    "name": {
+      "eng": "Western Europe",
+      "jpn": "西ヨーロッパ",
+      "fra": "Europe de l'Ouest",
+      "spa": "Europa Occidental",
+      "zho": "西欧",
+      "kor": "서유럽"
+    }
+  }
+]

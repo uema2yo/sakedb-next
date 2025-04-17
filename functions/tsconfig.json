@@ -1,0 +1,35 @@
+{
+  "compilerOptions": {
+    "module": "commonjs",
+    "esModuleInterop": true,
+    "moduleResolution": "node",
+    "noImplicitReturns": true,
+    "noUnusedLocals": true,
+    "outDir": "lib",
+    "rootDir": "src",
+    "sourceMap": true,
+    "strict": true,
+    "target": "es2017",
+    "skipLibCheck": true,
+    "lib": [
+      "es2017"
+    ],
+    "forceConsistentCasingInFileNames": true,
+    "noEmit": false,
+    "incremental": true,
+    "resolveJsonModule": true,
+    "allowJs": true,
+    "isolatedModules": true,
+    "jsx": "preserve"
+  },
+  "compileOnSave": true,
+  "include": [
+    "src"
+  ],
+  "files": [
+    "src/index.ts"
+  ],
+  "exclude": [
+    "node_modules"
+  ]
+}

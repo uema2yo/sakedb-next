@@ -1,45 +1,55 @@
 import { updateCodes } from "@lib/code/updateCodes";
 
+const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
+
+
 const fetchOptions: RequestInit = {};
 if (process.env.NEXT_PUBLIC_RESAS_API_KEY) {
 	fetchOptions.headers = { "X-API-KEY": process.env.NEXT_PUBLIC_RESAS_API_KEY };
 }
 
 async function getCityApi(prefCode: number) {
-	if (prefCode === 0) return;
-	const cityApi = await fetch(
-		`https://opendata.resas-portal.go.jp/api/v1/cities?prefCode=${prefCode}`,
-		fetchOptions
-	);
-	return await cityApi.json();
+	if (prefCode > 0) {
+		console.log(prefCode)
+		const cityApi = await fetch(`${baseUrl}/api/city?prefCode=${prefCode}`);
+		return await cityApi.json();
+	} else {
+		return null;
+	}
 }
 
 export async function updateCityCodes() {
 	try {
+    const prefecture = await fetch(`${baseUrl}/api/prefecture`);
+    const prefectures = await prefecture.json();
+
+		/*
 		const prefectureApi = await fetch(
 			"https://opendata.resas-portal.go.jp/api/v1/prefectures",
 			fetchOptions
 		);
 		const resPrefectureApi = await prefectureApi.json();
 		const resPrefectureApiResults = resPrefectureApi.result;
-
-		resPrefectureApiResults.forEach(async (prefecture: { prefCode: number; prefName: string }) => {
-			const resCityApi = await getCityApi(prefecture.prefCode);
-			const resCityApiResults = resCityApi.result;
-			let cityCodes: { code: string | number; label: string; prefCode: number; bigCityFlag: string }[] = [];
-			resCityApiResults.forEach((r: { bigCityFlag: string; cityCode: number; cityName: string; prefCode: number; }) => {
-				if (r.bigCityFlag !== "1") {
-					cityCodes.push({
-						code: r.cityCode,
-						label: r.cityName,
-						prefCode: r.prefCode,
-						bigCityFlag: r.bigCityFlag
-					});
-				}
-			});
-			updateCodes("b_code_city", cityCodes);
-			cityCodes = [];
-		});
+*/
+		prefectures.forEach(async (prefecture: { code: number; name: string }) => {
+      const cities = await getCityApi(prefecture.code);
+      let cityCodes: {
+        code: string | number;
+        label: string;
+        prefCode: number;
+      }[] = [];
+      cities.forEach(
+        (r: { code: number; name: string; prefecture_code: number }) => {
+          cityCodes.push({
+            code: r.code,
+            label: r.name,
+            prefCode: r.prefecture_code,
+          });
+        }
+      );
+      updateCodes("b_code_city", cityCodes);
+      cityCodes = [];
+    });
 
 	} catch (error) {
 		console.error("市区町村一覧データ API の読み込みに失敗しました。");

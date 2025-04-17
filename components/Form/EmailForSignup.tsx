@@ -20,6 +20,7 @@ const EmailForSignup = () => {
       handleCodeInApp: true,
     };
     try {
+      console.log(auth, email, actionCodeSettings)
       await sendSignInLinkToEmail(auth, email, actionCodeSettings);
       window.localStorage.setItem("emailForSignup", email); // localStorage に保存するのは不安なので Firestore で持つように変更する
       submitted = true;
