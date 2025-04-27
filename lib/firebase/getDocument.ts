@@ -16,7 +16,7 @@ interface Condition {
 	value: string | number | boolean;
 }
 
-interface CollectionConfig {
+interface GetCollectionConfig {
 	collectionName: string;
 	conditions?: Condition[];
 	public_only?: boolean;
@@ -27,7 +27,7 @@ interface CollectionConfig {
 	limit_num?: number | null;
 }
 
-export async function getDocument(config: CollectionConfig) {
+export async function getDocument(config: GetCollectionConfig) {
 	try {
 		const promise = async () => {
 			const { collectionName, conditions, public_only, order_by, limit_num } = config;

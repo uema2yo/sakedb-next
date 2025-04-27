@@ -1,73 +1,108 @@
-import React, { useState, useRef } from "react";
+"use strict";
+import React, { useState, useEffect, useRef } from "react";
+import type { ValidationErrorCode } from "@constants";
+import { errorCodes } from "@apollo/client/invariantErrorCodes";
 
 interface Props {
   field: {
     id: string;
     collectionName: string;
-    fields: [
-      {
-        name: string;
-        type: string;
-        value: string;
-        disabled: boolean;
-        label: string;
-      },
-      { name: string; type: string; value: string }
-    ];
+    fields: (
+      | {
+          name: string;
+          type: string;
+          value: string | number | boolean;
+          disabled: boolean;
+          label: string;
+        }
+      | {
+          name: string;
+          type: string;
+          value: string | number | boolean;
+        }
+    )[];
   };
   isPublic: boolean;
-  isUserLoggedIn: boolean;
+  userLoggedIn: boolean;
+  validate?: (
+    id: string,
+    value: string | number | boolean
+  ) => Promise<{
+    result: boolean;
+    message?: string | undefined;
+  }>;
   save: Function;
   startEditing: Function;
+  children?: React.ReactNode;
 }
 
 const EditableFields = (props: Props) => {
-	const { field, isPublic, isUserLoggedIn, save } = props;
+  const { field, isPublic, userLoggedIn, save } = props;
   const [isEditing, setIsEditing] = useState(false);
-  const [isCompositionInProgress, setIsCompositionInProgress] = useState(false);
   const [editedFields, setEditedFields] = useState(() =>
     JSON.parse(JSON.stringify(field.fields))
   );
+  const [errorMessage, setErrorMessage] = useState<string | null | undefined>("");
   const inputElements = useRef(new Array(field.fields.length));
 
   const startEditing = () => {
     props.startEditing();
-		// Implement your logic here
     setIsEditing(true);
     setEditedFields(JSON.parse(JSON.stringify(field.fields)));
-    setIsCompositionInProgress(false);
-
-    // Additional logic if required
   };
 
-  const saveFields = () => {
-    
-  }
-  
-  const cancelEdit = () => {
+  const handleChangeText = async(i: number, event: React.ChangeEvent<HTMLInputElement>) => {
+    const prevFields = field.fields;
+    const newFields = [...editedFields];
+    const value = event.target.value;
+    const validate = () => {
+      if (prevFields !== newFields) {
+        return props.validate && props.validate(props.field.id, value);
+      }
+    }
+    const validateResult = validate();
+    const errorMessage = (validateResult && (await validateResult).result === false) ?  (await validateResult)?.message : "";
+    setErrorMessage(errorMessage);
 
+    newFields[i] = {
+      ...newFields[i],
+      value: value,
+    };
+    setEditedFields(newFields);
+
+  };
+
+  const saveFields = async(event: React.FormEvent<HTMLFormElement>) => {
+    const form = event.target as HTMLFormElement;
+    await props.save(form);
+    setIsEditing(false);
   }
+  const cancelEdit = () => {
+    setIsEditing(false);
+  };
+
+  useEffect(() => {
+    if (isEditing) {
+      setEditedFields(JSON.parse(JSON.stringify(field.fields)));
+    }
+  }, [isEditing, field.fields]);
 
   return (
     <>
-      {isEditing && props.isUserLoggedIn ? (
+      {isEditing && props.userLoggedIn ? (
         <form
           onSubmit={(event) => {
             event.preventDefault();
-            saveFields();
+            saveFields(event);
           }}
         >
-          {editedFields.map(
+          {editedFields?.map(
             (
               fieldData: {
                 type: string;
                 selectName: string | undefined;
-                value:
-                  | string
-                  | number
-                  | boolean
-                  | readonly string[]
-                  | undefined;
+                value: string | number | undefined;
+                chrcked: boolean;
                 options: any[];
                 disabled: boolean | undefined;
                 label:
@@ -88,8 +123,8 @@ const EditableFields = (props: Props) => {
             ) => {
               switch (fieldData.type) {
                 case "select":
-                  return (
-                    {/*
+                  return {
+                    /*
                     <select
                       key={i}
                       id={`editable-input-${i}`}
@@ -127,8 +162,8 @@ const EditableFields = (props: Props) => {
                           </option>
                         )
                       )}
-                    </select> */}
-                  );
+                    </select> */
+                  };
                 case "checkbox":
                   return (
                     <div key={i}>
@@ -195,8 +230,8 @@ const EditableFields = (props: Props) => {
                     </div>
                   );
                 case "date":
-                  return (
-                    {/*
+                  return {
+                    /*
                     <input
                       key={i}
                       type="date"
@@ -205,20 +240,24 @@ const EditableFields = (props: Props) => {
                       value={fieldData.value}
                       onKeyDown={(e) => e.key === "Enter" && saveFields()}
                       onChange={}
-                    />*/}
-                  );
+                    />*/
+                  };
                 default:
                   return (
-                    {/*
-                    <input
-                      key={i}
-                      type="text"
-                      id={`editable-input-${i}`}
-                      ref={(el) => (inputElements.current[i] = el)}
-                      value={fieldData.value}
-                      onKeyDown={(e) => e.key === "Enter" && saveFields()}
-                      onChange={}
-                    />*/}
+                    <div key={i}>
+                      {
+                        <input
+                          type="text"
+                          name={field.id}
+                          id={`editable-input-${field.id}`}
+                          ref={el => (inputElements.current[i as number] = el)}
+                          value={fieldData.value ?? ""}
+                          //onKeyDown={ e => e.key === "Enter" && saveFields()}
+                          onChange={e => handleChangeText(i as number, e)}
+                        />
+                      }
+                      {errorMessage !=="" && <p>{errorMessage}</p>}
+                    </div>
                   );
               }
             }
@@ -228,12 +267,15 @@ const EditableFields = (props: Props) => {
             Cancel
           </button>
         </form>
-      ) : isUserLoggedIn ? (
+      ) : userLoggedIn ? (
         // Button to start editing
-        <button onClick={startEditing}>Edit</button>
+        <>
+          {props.children}
+          <button onClick={startEditing}>Edit</button>
+        </>
       ) : isPublic ? (
         // Display for public view
-        <div>Public Content</div>
+        <>{props.children}</>
       ) : null}
     </>
   );

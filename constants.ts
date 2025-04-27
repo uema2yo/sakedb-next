@@ -26,3 +26,25 @@ export const DOMESTIC_REGION_CODES = [
     prefectureCodes: [40, 41, 42, 43, 44, 45, 46, 47],
   }
 ];
+export type ValidationErrorCode =
+  | "REQUIRED"
+  | "INVALID_FORMAT"
+  | "INVALID_CHAR_ALNUM"
+  | "TOO_SHORT"
+  | "TOO_LONG"
+  | "NOT_MATCH"
+  | "INVALID_CHAR"
+  | "OUT_OF_RANGE"
+  | "ALREADY_EXISTS";
+
+export const VALIDATION_ERROR_CODES: {[key in ValidationErrorCode]: string} = {
+  REQUIRED: "この項目は必須です。",
+  INVALID_FORMAT: "フォーマットが正しくありません。",
+  INVALID_CHAR_ALNUM: "半角英数と「_」以外は使用できません。",
+  TOO_SHORT: "入力が短すぎます。",
+  TOO_LONG: "入力が長すぎます。",
+  NOT_MATCH: "入力が一致しません。",
+  INVALID_CHAR: "使用できない文字が含まれています。",
+  OUT_OF_RANGE: "許可されている範囲外の値です。",
+  ALREADY_EXISTS: "既に使用されています。",
+}

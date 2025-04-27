@@ -38,6 +38,9 @@
       "@modules/*": [
         "./modules/*"
       ],
+      "@pages/*": [
+        "./pages/*"
+      ],
       "@styles/*": [
         "./styles/*"
       ],
@@ -46,7 +49,7 @@
       ],
       "@layout": [
         "./pages/layout"
-      ]
+      ],
     },
     "forceConsistentCasingInFileNames": true
   },

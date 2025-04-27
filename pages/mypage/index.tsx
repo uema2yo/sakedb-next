@@ -2,8 +2,8 @@
 
 import Layout from "@layout";
 import Login from "@components/Form/Login";
-import Profile from "@modules/Profile";
-
+import Loading from "@components/Loading";
+import Profile from "@pages/profile";
 import type { LoginInfoProps } from "@lib/checkLogin";
 
 interface Props {
@@ -13,20 +13,21 @@ interface Props {
 
 const Mypage = (props: Props) => {
   const { loginInfo, loginLoading } = props;
-
+  const uid = loginInfo.uid;
+console.log(uid)
   return(
     <Layout loginInfo={loginInfo} loginLoading={loginLoading} >
       <main>
       <header>
           <h1>マイページ</h1>
-
       </header>
-      {loginInfo.uid ? (
-    		<Profile uid={loginInfo.uid} />
+
+      {loginLoading ? (
+        <Loading />
+      ) : uid !== "" ? (
+    		<Profile uid={uid} />
       ):(
-        <>
-          <Login />
-        </>
+        <Login />
       )
       }
       </main>

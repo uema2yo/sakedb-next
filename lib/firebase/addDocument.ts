@@ -10,8 +10,8 @@ export async function addDocument(
 		await checkLogin();
 		const uid = loginInfo.uid;
 		const timestamp = new Date().getTime();
-		document["timestamp"] = timestamp;
-		document["uid"] = uid;
+		document["timestamp"] = document["timestamp"] || timestamp;
+		document["uid"] = document["uid"] || uid;
 		await addDoc(collection(db, collectionName), document);
 	} catch (error: unknown) {
 		if (error instanceof Error) {

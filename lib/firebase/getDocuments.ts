@@ -20,19 +20,19 @@ interface Condition {
   value: string | number | boolean;
 }
 
-interface CollectionConfig {
+export interface GetCollectionConfig {
   collectionName: string;
-  conditions?: Condition[];
-  public_only?: boolean;
+  conditions?: Condition[] | null;
+  public_only?: boolean | null;
   order_by?: {
     field: string;
     direction: OrderByDirection;
-  };
+  } | null;
   limit_num?: number | null;
 }
 
 export async function getDocuments(
-  configs: CollectionConfig[]
+  configs: GetCollectionConfig[]
 ): Promise<DocumentData[]> {
   try {
     const promises = configs.map(async (config) => {
