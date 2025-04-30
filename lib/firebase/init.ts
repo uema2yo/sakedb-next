@@ -1,4 +1,4 @@
-import { initializeApp } from "firebase/app";
+import { initializeApp, getApps, getApp } from "firebase/app";
 import {
 	getAuth,
 	setPersistence,
@@ -6,9 +6,8 @@ import {
 	connectAuthEmulator
 } from "firebase/auth";
 import {
-	initializeFirestore,
-	CACHE_SIZE_UNLIMITED,
-	connectFirestoreEmulator
+  getFirestore,
+  connectFirestoreEmulator
 } from "firebase/firestore";
 
 interface FirebaseConfig {
@@ -35,17 +34,14 @@ const firebaseConfig: FirebaseConfig = {
 	authEmulatorHost: process.env.NEXT_PUBLIC_LOCAL === "TRUE" ? "localhost:9099" : ""
 };
 
-const app = initializeApp(firebaseConfig);
-
+const app = getApps().length ? getApp() : initializeApp(firebaseConfig);
+console.log("[init] Firebase App initialized");
+export const db = getFirestore(app);
+console.log("[init] Firestore initialized");
 export const auth = getAuth(app);
-
 setPersistence(auth, browserLocalPersistence);
 
-export const db = initializeFirestore(app, {
-	cacheSizeBytes: CACHE_SIZE_UNLIMITED
-});
-
 if (process.env.NEXT_PUBLIC_LOCAL === "TRUE") {
-	connectFirestoreEmulator(db, "127.0.0.1", 8080);
-	connectAuthEmulator(auth, "http://localhost:9099");
+  connectFirestoreEmulator(db, "127.0.0.1", 8080);
+  connectAuthEmulator(auth, "http://localhost:9099");
 }

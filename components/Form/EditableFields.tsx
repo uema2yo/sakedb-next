@@ -1,7 +1,5 @@
 "use strict";
 import React, { useState, useEffect, useRef } from "react";
-import type { ValidationErrorCode } from "@constants";
-import { errorCodes } from "@apollo/client/invariantErrorCodes";
 
 interface Props {
   field: {
@@ -42,6 +40,7 @@ const EditableFields = (props: Props) => {
   const [editedFields, setEditedFields] = useState(() =>
     JSON.parse(JSON.stringify(field.fields))
   );
+  const [submitDisabled, setSubmitDisabled] = useState(true);
   const [errorMessage, setErrorMessage] = useState<string | null | undefined>("");
   const inputElements = useRef(new Array(field.fields.length));
 
@@ -61,21 +60,31 @@ const EditableFields = (props: Props) => {
       }
     }
     const validateResult = validate();
-    const errorMessage = (validateResult && (await validateResult).result === false) ?  (await validateResult)?.message : "";
-    setErrorMessage(errorMessage);
 
     newFields[i] = {
       ...newFields[i],
       value: value,
     };
+
     setEditedFields(newFields);
 
+    if (validateResult && (await validateResult).result === false) {
+      setErrorMessage((await validateResult)?.message);
+      setSubmitDisabled(false);
+    } else {
+      setErrorMessage("");
+      setSubmitDisabled(false);
+    }
   };
 
-  const saveFields = async(event: React.FormEvent<HTMLFormElement>) => {
+  const handleSave = async(event: React.FormEvent<HTMLFormElement>) => {
     const form = event.target as HTMLFormElement;
-    await props.save(form);
-    setIsEditing(false);
+    const save = await props.save(form);
+    if (save.result) {
+      setIsEditing(false);
+    } else {
+      setErrorMessage(save.message)
+    }
   }
   const cancelEdit = () => {
     setIsEditing(false);
@@ -93,7 +102,7 @@ const EditableFields = (props: Props) => {
         <form
           onSubmit={(event) => {
             event.preventDefault();
-            saveFields(event);
+            handleSave(event);
           }}
         >
           {editedFields?.map(
@@ -238,7 +247,7 @@ const EditableFields = (props: Props) => {
                       id={`editable-input-${i}`}
                       ref={(el) => (inputElements.current[i] = el)}
                       value={fieldData.value}
-                      onKeyDown={(e) => e.key === "Enter" && saveFields()}
+                      onKeyDown={(e) => e.key === "Enter" && handleSave()}
                       onChange={}
                     />*/
                   };
@@ -252,7 +261,7 @@ const EditableFields = (props: Props) => {
                           id={`editable-input-${field.id}`}
                           ref={el => (inputElements.current[i as number] = el)}
                           value={fieldData.value ?? ""}
-                          //onKeyDown={ e => e.key === "Enter" && saveFields()}
+                          //onKeyDown={ e => e.key === "Enter" && handleSave()}
                           onChange={e => handleChangeText(i as number, e)}
                         />
                       }
@@ -262,7 +271,7 @@ const EditableFields = (props: Props) => {
               }
             }
           )}
-          <button type="submit">Save</button>
+          <button type="submit" disabled={submitDisabled}>Save</button>
           <button type="button" onClick={cancelEdit}>
             Cancel
           </button>

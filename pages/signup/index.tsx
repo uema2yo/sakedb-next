@@ -1,14 +1,16 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, ReactNode } from "react";
 import { useRouter } from "next/router";
-import { auth, db } from "@lib/firebase/init";
-import { addDocument } from "@lib/firebase/addDocument";
+import { auth, db } from "@/lib/firebase/init";
+import { addDocument } from "@/lib/firebase/addDocument";
 import { setDoc, doc } from "firebase/firestore";
 import { User, createUserWithEmailAndPassword } from "firebase/auth";
-import Layout from "@layout";
-
-import type { LoginInfoProps } from "@lib/checkLogin";
+import { validateForms } from "@/lib/code/validateForms";
+import Layout from "@/layout";
+import type { LoginInfoProps } from "@/lib/checkLogin";
+import SignupButton from "@/components/SignupButton";
+import { createUser } from "@/lib/firebase/createUser";
 
 interface Props {
   loginInfo: LoginInfoProps;
@@ -20,6 +22,12 @@ const Signup = (props: Props) => {
   const [password, setPassword] = useState("");
   const [email, setEmail] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [validateUserId, setValidateUserId] = useState<{result: boolean; message?: string | undefined} | undefined>();
+  const [validatePassword, setValidatePassword] = useState<{result: boolean; message?: string | undefined} | undefined>();
+  const [errorMessageConfirmPassword, setErrorMessageConfirmPassword] = useState("");
+  const [validateEmailExists, setValidateEmailExists] = useState({result: true, message: ""});
+  const [submitDisabled,setSubmitDisabled] = useState(true);
+
   const router = useRouter();
   const { loginInfo, loginLoading } = props;
 
@@ -30,11 +38,7 @@ const Signup = (props: Props) => {
   const addUserAccount = async (user: User) => {
     const currentPath = window.location.pathname;
     const timestamp = new Date().getTime();  
-    await setDoc(doc(db, "m_user", user.uid), {
-      //uid を一致させるために m_user は setDoc を使う。
-      uid: user.uid,
-      timestamp: timestamp
-    });
+    await createUser(user);
     addDocument("b_user_id", {
       uid: user.uid,
       value: userId,
@@ -53,27 +57,52 @@ const Signup = (props: Props) => {
       timestamp: timestamp
     });
   };
+  
+  const handleChangeUserId = async(event: React.ChangeEvent<HTMLInputElement>) => {
+    const newUserId = event.target.value;
+    setUserId(newUserId);
+    const validate = await validateForms("id", newUserId, "signup");
+    setValidateUserId(validate);
+  }
+
+  const handleChangePassword = async(event: React.ChangeEvent<HTMLInputElement>) => {
+    const newPassword = event.target.value;
+    setPassword(newPassword);
+    const validate = await validateForms("password", newPassword)
+    setValidatePassword(validate);
+  }
 
   const handleSignup = async () => {
-    if (password !== confirmPassword) {
-      alert("パスワードが一致しません。");
-      return;
-    }
-
+    if (submitDisabled) return; 
     try {
       if (email) {
-        console.log(auth, email, password)
         const userCredential = await createUserWithEmailAndPassword(auth, email, password);
         await addUserAccount(userCredential.user);
-        // 登録成功後の処理
         router.push("/mypage");
       } else {
-        // Eメールアドレスが存在しない場合のエラー処理
+        setValidateEmailExists({result: false, message: "E メールアドレスが指定されていません。お手数ですが、ユーザー登録を最初からやり直してください。"});
       }
     } catch (error) {
       console.error(error);
     }
   };
+
+  useEffect(() => {
+    if (
+      validateUserId?.result &&
+      validatePassword?.result &&
+      password === confirmPassword
+    ) {
+      setSubmitDisabled(false);
+    } else {
+      setSubmitDisabled(true);
+    }
+    if (confirmPassword !== "" && password !== confirmPassword) {
+      setErrorMessageConfirmPassword("確認パスワードが一致しません。");
+    } else {
+      setErrorMessageConfirmPassword("");
+    }
+  }, [userId, password, confirmPassword, validateUserId, validatePassword]);
 
   return (
     <Layout loginInfo={loginInfo} loginLoading={loginLoading} >
@@ -82,13 +111,16 @@ const Signup = (props: Props) => {
           ユーザー ID とパスワードを設定してください。（※ ユーザー ID
           は、ウェブ上で一般公開されます。）
         </p>
+        {validateEmailExists.result ?
+        <div>
         <p>登録するEメールアドレス: {email}</p>
         <label>
           ユーザー ID:
           <input
             type="text"
             value={userId}
-            onChange={(e) => setUserId(e.target.value)}
+            autoComplete="username"
+            onChange={e => handleChangeUserId(e)}
           />
         </label>
         <label>
@@ -96,7 +128,8 @@ const Signup = (props: Props) => {
           <input
             type="password"
             value={password}
-            onChange={(e) => setPassword(e.target.value)}
+            autoComplete="new-password"
+            onChange={e => handleChangePassword(e)}
           />
         </label>
         <label>
@@ -104,11 +137,21 @@ const Signup = (props: Props) => {
           <input
             type="password"
             value={confirmPassword}
-            onChange={(e) => setConfirmPassword(e.target.value)}
+            autoComplete="new-password"
+            onChange={e => setConfirmPassword(e.target.value)}
           />
         </label>
+        {validateUserId?.message && <p>{validateUserId.message}</p>}
+        {validatePassword?.message && <p>{validatePassword.message}</p>}
+        {errorMessageConfirmPassword !== "" && <p>{errorMessageConfirmPassword}</p>}
 
-        <button onClick={handleSignup}>アカウント作成</button>
+        <button onClick={handleSignup} disabled={submitDisabled}>アカウント作成</button>
+        </div>
+        :
+        <>
+        {validateEmailExists.message !== "" && <p>{validateEmailExists.message}</p>}
+        <SignupButton />
+        </>}        
       </div>
     </Layout>
   );

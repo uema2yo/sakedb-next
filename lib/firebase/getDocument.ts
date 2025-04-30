@@ -7,7 +7,7 @@ import {
 	getDocs,
 	QuerySnapshot
 } from "firebase/firestore";
-import { db } from "@lib/firebase/init";
+import { db } from "@/lib/firebase/init";
 import type { WhereFilterOp, OrderByDirection, DocumentData } from "firebase/firestore";
 
 interface Condition {

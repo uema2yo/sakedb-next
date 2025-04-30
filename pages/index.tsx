@@ -1,5 +1,5 @@
-import type { LoginInfoProps } from "@lib/checkLogin";
-import Layout from "@layout";
+import type { LoginInfoProps } from "@/lib/checkLogin";
+import Layout from "@/layout";
 
 interface Props {
   loginInfo: LoginInfoProps;

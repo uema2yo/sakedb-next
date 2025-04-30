@@ -9,7 +9,7 @@ import {
 	where,
 	QuerySnapshot
 } from "firebase/firestore";
-import { db } from "@lib/firebase/init";
+import { db } from "@/lib/firebase/init";
 import type { DocumentData } from "firebase/firestore";
 
 export async function updateCodes(

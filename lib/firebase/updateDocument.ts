@@ -1,6 +1,6 @@
-import { db } from "@lib/firebase/init";
+import { db } from "@/lib/firebase/init";
 import { doc, updateDoc } from "firebase/firestore";
-import { checkLogin, loginInfo } from "@lib/checkLogin";
+import { checkLogin, loginInfo } from "@/lib/checkLogin";
 
 export async function updateDocument(
   collection_name: string,

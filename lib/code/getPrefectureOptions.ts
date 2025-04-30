@@ -1,4 +1,4 @@
-import { getDocuments } from "@lib/firebase/getDocuments";
+import { getDocuments } from "@/lib/firebase/getDocuments";
 
 interface Option {
 	value: number,

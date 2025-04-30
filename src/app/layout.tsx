@@ -5,9 +5,9 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import { useRef } from "react";
 import "./globals.css";
-import Header from "@components/Header";
-import Footer from "@components/Footer";
-import Dialog, { DialogComponentHandle } from "@components/Dialog";
+import Header from "@/components/Header";
+import Footer from "@/components/Footer";
+import Dialog, { DialogComponentHandle } from "@/components/Dialog";
 
 const inter = Inter({ subsets: ["latin"] });
 

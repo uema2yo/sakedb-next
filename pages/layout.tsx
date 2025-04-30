@@ -2,10 +2,12 @@
 
 import { ReactNode, useState, FC } from "react";
 import { useRef, useEffect } from "react";
-import type { LoginInfoProps } from "@lib/checkLogin";
-import Header from "@components/Header";
-import Footer from "@components/Footer";
-import Dialog, { DialogComponentHandle } from "@components/Dialog";
+import type { LoginInfoProps } from "@/lib/checkLogin";
+import Header from "@/components/Header";
+import Footer from "@/components/Footer";
+import Dialog, { DialogComponentHandle } from "@/components/Dialog";
+import SignupDialogButton from "@/components/SignupButton";
+import { DialogProvider } from "../contexts/dialogContext";
 
 interface LayoutProps {
   children: ReactNode;
@@ -30,7 +32,9 @@ const Layout: FC<LayoutProps> = ({ children, loginInfo, loginLoading }) => {
   };
 
   return (
-    <>
+    <DialogProvider
+      value={{ onDialogToggleButtonClick: handleDialogToggleButtonClick }}
+    >
       <Header
         onDialogToggleButtonClick={handleDialogToggleButtonClick}
         loginInfo={loginInfo}
@@ -39,7 +43,7 @@ const Layout: FC<LayoutProps> = ({ children, loginInfo, loginLoading }) => {
       {children}
       <Footer />
       <Dialog ref={dialogRef} id={id} title={title} slot={slot} />
-    </>
+    </DialogProvider>
   );
 };
 

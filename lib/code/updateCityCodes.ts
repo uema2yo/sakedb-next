@@ -1,4 +1,4 @@
-import { updateCodes } from "@lib/code/updateCodes";
+import { updateCodes } from "@/lib/code/updateCodes";
 
 const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
 

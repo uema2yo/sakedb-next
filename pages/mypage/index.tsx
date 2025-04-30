@@ -1,10 +1,10 @@
 "use client";
 
-import Layout from "@layout";
-import Login from "@components/Form/Login";
-import Loading from "@components/Loading";
-import Profile from "@pages/profile";
-import type { LoginInfoProps } from "@lib/checkLogin";
+import Layout from "@/layout";
+import Login from "@/components/Form/Login";
+import Loading from "@/components/Loading";
+import ProfileModule from "@/modules/ProfileModule";
+import type { LoginInfoProps } from "@/lib/checkLogin";
 
 interface Props {
   loginInfo: LoginInfoProps;
@@ -25,8 +25,8 @@ console.log(uid)
       {loginLoading ? (
         <Loading />
       ) : uid !== "" ? (
-    		<Profile uid={uid} />
-      ):(
+        <ProfileModule uid={uid} />
+    		      ):(
         <Login />
       )
       }

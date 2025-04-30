@@ -2,16 +2,16 @@
 
 import React, { useState, useEffect, MouseEventHandler } from "react";
 import { useRouter } from "next/router";
-import { auth, db } from "@lib/firebase/init";
-import { addDocument } from "@lib/firebase/addDocument";
-import { getDocuments } from "@lib/firebase/getDocuments";
-// import { updateRegionCodes } from "@lib/code/updateRegionCodes";
-// import { updateCountryCodes } from "@lib/code/updateCountryCodes";
-import { updatePrefectureCodes } from "@lib/code/updatePrefectureCodes";
-import { updateCityCodes } from "@lib/code/updateCityCodes";
-import type { LoginInfoProps } from "@lib/checkLogin";
+import { auth, db } from "@/lib/firebase/init";
+import { addDocument } from "@/lib/firebase/addDocument";
+import { getDocuments } from "@/lib/firebase/getDocuments";
+// import { updateRegionCodes } from "@/lib/code/updateRegionCodes";
+// import { updateCountryCodes } from "@/lib/code/updateCountryCodes";
+import { updatePrefectureCodes } from "@/lib/code/updatePrefectureCodes";
+import { updateCityCodes } from "@/lib/code/updateCityCodes";
+import type { LoginInfoProps } from "@/lib/checkLogin";
 
-import Layout from "@layout";
+import Layout from "@/layout";
 
 interface Props {
   loginInfo: LoginInfoProps;

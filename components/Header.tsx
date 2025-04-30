@@ -1,9 +1,11 @@
 import React, { ReactNode, FC } from "react";
-import { SITE_TITLE } from "@constants";
-import Login from "@components/Form/Login";
-import Logout from "@components/Form/Logout";
-import EmailForSignup from "@components/Form/EmailForSignup";
-import Loading from "@components/Loading";
+import { SITE_TITLE } from "@/constants";
+import Login from "@/components/Form/Login";
+import Logout from "@/components/Form/Logout";
+import EmailForSignup from "@/components/Form/EmailForSignup";
+import Loading from "@/components/Loading";
+import Signup from "@/pages/signup";
+import SignupButton from "./SignupButton";
 
 type HeaderProps = {
   onDialogToggleButtonClick: (
@@ -47,17 +49,7 @@ const Header: FC<HeaderProps> = ({
           >
             ログイン
           </button>
-          <button
-            onClick={() =>
-              onDialogToggleButtonClick(
-                "signup",
-                "ユーザー登録",
-                <EmailForSignup />
-              )
-            }
-          >
-            ユーザー登録
-          </button>
+          <SignupButton />
         </>
       )}
     </header>

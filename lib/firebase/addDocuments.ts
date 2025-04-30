@@ -1,5 +1,5 @@
 import { collection, writeBatch, doc } from "firebase/firestore";
-import { db } from "@lib/firebase/init";
+import { db } from "@/lib/firebase/init";
 
 export async function addDocuments(
 	collectionName: string,

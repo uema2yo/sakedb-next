@@ -1,15 +1,10 @@
 import { useState, useEffect } from "react";
-import { addDocument } from "@lib/firebase/addDocument";
-import { getDocuments } from "@lib/firebase/getDocuments";
-import type { GetCollectionConfig } from "@lib/firebase/getDocuments"
-import { VALIDATION_ERROR_CODES } from "@constants";
-import type { ValidationErrorCode } from "@constants";
-import Loading from "@components/Loading";
-import { collection } from "firebase/firestore/lite";
-import { getDoc, doc } from "firebase/firestore";
-import EditableFields from "@components/Form/EditableFields";
-import { getDocument } from "@lib/firebase/getDocument";
-import { updateDocument } from "@lib/firebase/updateDocument";
+import { addDocument } from "@/lib/firebase/addDocument";
+import { getDocuments } from "@/lib/firebase/getDocuments";
+import type { GetCollectionConfig } from "@/types/getDocumentsConfig";
+import Loading from "@/components/Loading";
+import EditableFields from "@/components/Form/EditableFields";
+import { validateForms } from "@/lib/code/validateForms";
 
 interface Props {
   uid: string;
@@ -17,10 +12,10 @@ interface Props {
 
 interface UserProfileItem {
   [key: string]: { [key: string]: boolean | string | number };
-  //[key: string]: { public: boolean, value: boolean | string | number };
 }
 
 const ProfileModule = (props: Props) => {
+  console.log(props)
   const profileConfig: {
     [key: string]: GetCollectionConfig
   } = {
@@ -277,59 +272,15 @@ const ProfileModule = (props: Props) => {
   }
 
   const validate = async(id: string, value: string | number | boolean ) => {
-    const execute: {[key:string]: () => Promise<{ result: boolean; message?: string | undefined; }>} = {
-      id: async() => {
-        const duplicateIdConfig: GetCollectionConfig = {
-          collectionName: "b_user_id",
-          conditions: [
-            { name: "value", operator: "==", value: value },
-            { name: "uid", operator: "!=", value: props.uid  },
-          ],
-        };
-        const duplicateItems = await getDocuments([duplicateIdConfig]) as Array<{ public: boolean; value: string | number | boolean }>;
-        
-        console.log("duplicateItems",id, duplicateItems);
-        if(/[^a-zA-Z0-9_]/.test(value as string) ){
-          return {
-            result: false,
-            message: `ユーザー ID は、半角英数と「_」以外は使用できません。`
-          }
-        } else if ( duplicateItems.length > 0) {
-          return {
-            result: false,
-            message: `このユーザー ID は、他のユーザーがすでに使用しています。`
-          }
-        } else {
-          return {
-            result: true,
-          };
-        }
-      },
-    }
-    console.log("validate",id, value, await execute[id]())
-    const a =await execute[id]()
-
-    return await execute[id]();
+    return await validateForms( id, value, props.uid);
   }
+
   const handleSave = {
     id: async(form: { elements: { namedItem: (arg0: string) => { value: string; }; }; }) => {
       const id = form.elements.namedItem("id").value;
-      await save2Collection("id", "b_user_id", {value: id, public: true})
-      
-/*      
-      const duplicateIdConfig: GetCollectionConfig = {
-        collectionName: "b_user_id",
-        conditions: [{ name: "value", operator: "==", value: id }],
-      };
-      const duplicateItems = await getDocuments([duplicateIdConfig]) as Array<{ public: boolean; value: string | number | boolean }>;
-      
-      console.log("dup",duplicateItems)
-      if(duplicateItems.length === 0) {
-        await save2Collection("id", "b_user_id", {value: id, public: true})
-      } else {
-        
-        console.error("このユーザー ID はすでに使われています。")
-      }*/
+      const valid = await validate("id", id);
+      valid.result && await save2Collection("id", "b_user_id", {value: id, public: true});
+      return valid;
     },
     name: async(form: { elements: { namedItem: (arg0: string) => { value: string; }; }; }) => {
       const name = form.elements.namedItem("name").value;

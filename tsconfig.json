@@ -26,28 +26,34 @@
       "@/*": [
         "./src/*"
       ],
-      "@app/*": [
+      "@/app/*": [
         "./src/app/*"
       ],
-      "@lib/*": [
+      "@/lib/*": [
         "./lib/*"
       ],
-      "@components/*": [
+      "@/components/*": [
         "./components/*"
       ],
-      "@modules/*": [
+      "@/contexts/*": [
+        "./contexts/*"
+      ],
+      "@/modules/*": [
         "./modules/*"
       ],
-      "@pages/*": [
+      "@/pages/*": [
         "./pages/*"
       ],
-      "@styles/*": [
+      "@/styles/*": [
         "./styles/*"
       ],
-      "@constants": [
+      "@/types/*": [
+        "./types/*"
+      ],
+      "@/constants": [
         "./constants"
       ],
-      "@layout": [
+      "@/layout": [
         "./pages/layout"
       ],
     },

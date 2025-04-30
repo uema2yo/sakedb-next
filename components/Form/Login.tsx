@@ -1,7 +1,7 @@
 "use client";
 import { useState, useEffect, FormEvent } from "react";
 import { useRouter } from "next/router";
-import { auth } from "@lib/firebase/init";
+import { auth } from "@/lib/firebase/init";
 import {
   onAuthStateChanged,
   setPersistence,

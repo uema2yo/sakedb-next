@@ -1,5 +1,5 @@
-import { updateCodes } from "@lib/code/updateCodes";
-import { DOMESTIC_REGION_CODES } from "@constants";
+import { updateCodes } from "@/lib/code/updateCodes";
+import { DOMESTIC_REGION_CODES } from "@/constants";
 
 const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
 

@@ -1,4 +1,5 @@
-import ProfileModule from "@modules/ProfileModule";
+import ProfileModule from "@/modules/ProfileModule";
+
 interface Props {
   uid: string
 }
