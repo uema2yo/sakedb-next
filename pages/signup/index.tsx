@@ -61,14 +61,14 @@ const Signup = (props: Props) => {
   const handleChangeUserId = async(event: React.ChangeEvent<HTMLInputElement>) => {
     const newUserId = event.target.value;
     setUserId(newUserId);
-    const validate = await validateForms("id", newUserId, "signup");
+    const validate = await validateForms("id", newUserId, false, "signup");
     setValidateUserId(validate);
   }
 
   const handleChangePassword = async(event: React.ChangeEvent<HTMLInputElement>) => {
     const newPassword = event.target.value;
     setPassword(newPassword);
-    const validate = await validateForms("password", newPassword)
+    const validate = await validateForms("password", newPassword, false)
     setValidatePassword(validate);
   }
 
@@ -97,8 +97,8 @@ const Signup = (props: Props) => {
     } else {
       setSubmitDisabled(true);
     }
-    if (confirmPassword !== "" && password !== confirmPassword) {
-      setErrorMessageConfirmPassword("確認パスワードが一致しません。");
+    if (password !== "" && password !== confirmPassword) {
+      setErrorMessageConfirmPassword("確認用パスワードに同じパスワードをもう一度入力してください。");
     } else {
       setErrorMessageConfirmPassword("");
     }
@@ -133,7 +133,7 @@ const Signup = (props: Props) => {
           />
         </label>
         <label>
-          パスワード（確認）:
+          確認用パスワード:
           <input
             type="password"
             value={confirmPassword}

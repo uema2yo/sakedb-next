@@ -13,8 +13,8 @@ interface Props {
 
 const Mypage = (props: Props) => {
   const { loginInfo, loginLoading } = props;
-  const uid = loginInfo.uid;
-console.log(uid)
+  const uid = loginInfo ? loginInfo.uid : "";
+
   return(
     <Layout loginInfo={loginInfo} loginLoading={loginLoading} >
       <main>
@@ -26,7 +26,7 @@ console.log(uid)
         <Loading />
       ) : uid !== "" ? (
         <ProfileModule uid={uid} />
-    		      ):(
+    	):(
         <Login />
       )
       }

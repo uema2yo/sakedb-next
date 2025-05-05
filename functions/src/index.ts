@@ -17,7 +17,6 @@ let isReady = false;
 
 app.use(cors({ origin: true }));
 nextApp.prepare().then(() => {
-  console.log("api", apiKey, endPoint);
   app.get("/api/prefecture", async (req, res) => {
     try {
       const response = await axios.post(

@@ -1,5 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from "next";
-import { db } from "@/lib/firebase/admin"; // firebase-admin の Firestore
+import { db } from "@/lib/firebase/admin";
+//import { db } from "@/lib/firebase/init";
+
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== "POST") {

@@ -5,13 +5,19 @@ import type { GetCollectionConfig } from "@/types/getDocumentsConfig";
 import Loading from "@/components/Loading";
 import EditableFields from "@/components/Form/EditableFields";
 import { validateForms } from "@/lib/code/validateForms";
+import { formatDate, generateUniqueToken, getLabelFromCode, loadArrayFromJSON } from "@/lib/util";
+import { GENDER_CODES } from "@/constants";
+import { sign } from "crypto";
 
 interface Props {
   uid: string;
 }
 
 interface UserProfileItem {
-  [key: string]: { [key: string]: boolean | string | number };
+  [key: string]: { 
+    public: boolean; 
+    value:  boolean | string | number;
+  };
 }
 
 const ProfileModule = (props: Props) => {
@@ -48,43 +54,45 @@ const ProfileModule = (props: Props) => {
 			limit_num: 1
 		},
 		residenceRegion: {
-			collectionName: "b_user_residence_region",
+			collectionName: "b_user_residenceRegion",
 			conditions: [{ name: "uid", operator: "==", value: props.uid }],
 			public_only: false,
 			order_by: { field: "timestamp", direction: "desc" },
 			limit_num: 1
 		},
 		residenceCountry: {
-			collectionName: "b_user_residence_country",
+			collectionName: "b_user_residenceCountry",
 			conditions: [{ name: "uid", operator: "==", value: props.uid }],
 			public_only: false,
 			order_by: { field: "timestamp", direction: "desc" },
 			limit_num: 1
 		},
 		residencePrefecture: {
-			collectionName: "b_user_residence_prefecture",
+			collectionName: "b_user_residencePrefecture",
 			conditions: [{ name: "uid", operator: "==", value: props.uid }],
 			public_only: false,
 			order_by: { field: "timestamp", direction: "desc" },
 			limit_num: 1
 		},
 		residenceCity: {
-			collectionName: "b_user_residence_city",
+			collectionName: "b_user_residenceCity",
 			conditions: [{ name: "uid", operator: "==", value: props.uid }],
 			public_only: false,
 			order_by: { field: "timestamp", direction: "desc" },
 			limit_num: 1
 		}
 	};
+  // 初期 ID/ユーサー名
+  const altUserId = `user-${generateUniqueToken(12)}`;
+  const altUserName = `ユーザー${generateUniqueToken(6)}`;
 
   const [userProfileItem, setUserProfileItem] = useState<UserProfileItem>(
     {
-      id: { public: true, value: "" },
-      name: { public: true, value: "" },
-      gender: { public: false, value: 0 },
-      //birthdate: { public: false, value: 0, format: "" },
+      id: { public: true, value: altUserId },
+      name: { public: true, value: altUserName },
+      gender: { public: true, value: 0 },
       birthdate: { public: false, value: 0 },
-      residenceRegion: { public: false, value: 0 },
+      residenceRegion: { public: true, value: 0 },
       residenceCountry: { public: false, value: 0 },
       residencePrefecture: { public: false, value: 0 },
       residenceCity: { public: false, value: 0 },
@@ -94,23 +102,96 @@ const ProfileModule = (props: Props) => {
       favoriteCity: { public: false, value: 0 },  
     }
   )
-
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [idField, setIdField] = useState({
-    id: "id",
-    collectionName: "b_user_id",
-    fields: [
-      {
-        name: "public",
-        type: "checkbox",
-        value: userProfileItem.id.public,
-        disabled: true,
-        label: "公開",
-      },
-      { name: "value", type: "text", value: userProfileItem.id.value },
-    ]
-  });
+  const [subregions, setSubregions] = useState<{code: number,label: Record<string, string>;}[]>();
+
+  const field = {
+    id: {
+      id: "id",
+      //collectionName: "b_user_id",
+      fields: [
+        {
+          name: "public",
+          type: "checkbox",
+          checked: userProfileItem.id.public as boolean,
+          disabled: true,
+        },
+        { name: "value",
+          type: "text",
+          value: userProfileItem.id.value
+        },
+      ],
+    },
+    name: {
+      id: "name",
+      //collectionName: "b_user_name",
+      fields: [
+        {
+          name: "public",
+          type: "checkbox",
+          checked: userProfileItem.name.public,
+          disabled: true,
+        },
+        { name: "value",
+          type: "text",
+          value: userProfileItem.name.value
+        },
+      ],
+    },
+    gender: {
+      id: "gender",
+      //collectionName: "b_user_gender",
+      fields: [
+        {
+          name: "public",
+          type: "checkbox",
+          checked: userProfileItem.gender.public,
+          disabled: false,
+        },
+        {
+          name: "value",
+          type: "select",
+          value: userProfileItem.gender.value,
+          options: GENDER_CODES,
+        },
+      ],
+    },
+    birthdate: {
+      id: "birthdate",
+      //collectionName: "b_user_birthdate",
+      fields: [
+        {
+          name: "public",
+          type: "checkbox",
+          checked: userProfileItem.birthdate.public,
+          disabled: false,
+        },
+        { name: "value",
+          type: "date",
+          value: userProfileItem.birthdate.value },
+      ],
+    },
+    residenceRegion: {
+      id: "residenceRegion",
+      //collectionName: "b_user_residenceRegion",
+      fields: [
+        {
+          name: "public",
+          type: "checkbox",
+          checked: userProfileItem.residenceRegion.public,
+          disabled: false,
+        },
+        {
+          name: "value",
+          type: "select",
+          value: userProfileItem.residenceRegion.value,
+          options: subregions,
+        },
+      ],
+    },
+  };
+/*
   const [nameField, setNameField] = useState({
     id: "name",
     collectionName: "b_user_name",
@@ -126,44 +207,90 @@ const ProfileModule = (props: Props) => {
     ]
   });
 
+  const [genderField, setGenderField] = useState({
+    id: "name",
+    collectionName: "b_user_gender",
+    fields: [
+      {
+        name: "public",
+        type: "checkbox",
+        value: userProfileItem.gender.public,
+        disabled: false,
+        label: "",
+      },
+      { name: "value", type: "text", value: userProfileItem.name.value },
+    ]
+  });
+  */
+  /*
+  const [idField, setIdField] = useState({
+    id: "id",
+    collectionName: "b_user_id",
+    fields: [
+      {
+        name: "public",
+        type: "checkbox",
+        value: userProfileItem.id.public,
+        disabled: true,
+        label: "公開",
+      },
+      { name: "value", type: "text", value: userProfileItem.id.value },
+    ]
+  });
+
+  const [nameField, setNameField] = useState({
+    id: "name",
+    collectionName: "b_user_name",
+    fields: [
+      {
+        name: "public",
+        type: "checkbox",
+        value: userProfileItem.name.public,
+        disabled: true,
+        label: "公開",
+      },
+      { name: "value", type: "text", value: userProfileItem.name.value },
+    ]
+  });
+
+  const [genderField, setGenderField] = useState({
+    id: "name",
+    collectionName: "b_user_gender",
+    fields: [
+      {
+        name: "public",
+        type: "checkbox",
+        value: userProfileItem.gender.public,
+        disabled: false,
+        label: "",
+      },
+      { name: "value", type: "text", value: userProfileItem.name.value },
+    ]
+  });
+  */
+/*
   const setField: { [key: string]: () => void } =  {
     id: () => {
-      setIdField({
-        id: "id",
-        collectionName: "b_user_id",
-        fields: [
-          {
-            name: "public",
-            type: "checkbox",
-            value: userProfileItem.id.public,
-            disabled: true,
-            label: "公開",
-          },
-          { name: "value", type: "text", value: userProfileItem.id.value },
-        ],
-      });
+      setUserProfileItem({
+        ...userProfileItem,
+        id: getCurrentUserProfile(document.id, altUserId),  
+      })
     },
     name: () => {
-      setNameField({
-        id: "name",
-        collectionName: "b_user_name",
-        fields: [
-          {
-            name: "public",
-            type: "checkbox",
-            value: userProfileItem.name.public,
-            disabled: true,
-            label: "公開",
-          },
-          { name: "value", type: "text", value: userProfileItem.name.value },
-        ],
-      });
+      setUserProfileItem({
+        ...userProfileItem,
+        name: getCurrentUserProfile(document.name, altUserName),  
+      })
     },
-  }
-  const [document, setDocument] = useState<Record<string, { public: boolean; value: string | number | boolean }>>({});
+    gender: () => {
+      setUserProfileItem({
+        ...userProfileItem,
+        name: getCurrentUserProfile(document.gender, 0),  
+      })
+    }
+  }*/
 
-  const altUserId = "user";
-  const altUserName = "ユーザー";
+  const [document, setDocument] = useState<Record<string, { public: boolean; value: string | number | boolean }>>({});
 
   const getCurrentUserProfile = (
     doc: { public: boolean; value: string | number | boolean },
@@ -175,22 +302,8 @@ const ProfileModule = (props: Props) => {
     };
   }
 
-  useEffect( () => {
-    refreshCurrentUserProfile();
-    setLoading(false);
-  },[]);
-
-  useEffect(() => {
-    setUserProfileItem({
-      ...userProfileItem,
-      id: getCurrentUserProfile(document.id, altUserId),
-      name: getCurrentUserProfile(document.name, altUserName),
-    })
-  },[document]);
-
   async function refreshCurrentUserProfile(configName?: string | null) {
     let res: Array<{ public: boolean; value: string | number | boolean }> = [];
-    console.log(configName)
     if (configName && configName !== "") {
       res = await getDocuments([profileConfig[configName]]) as Array<{ public: boolean; value: string | number | boolean }>;
       setDocument(prev => ({
@@ -265,27 +378,46 @@ const ProfileModule = (props: Props) => {
 			? residenceCityFormat.innerText
 			: "----";
     */
-    console.log( userProfileItem.id)
-    console.log( userProfileItem.name)
 
     setLoading(false);
   }
 
-  const validate = async(id: string, value: string | number | boolean ) => {
-    return await validateForms( id, value, props.uid);
+  const validate = async(id: string, value: string | number | boolean, saveOnly:boolean ) => {
+    return await validateForms( id, value, saveOnly, props.uid);
   }
 
   const handleSave = {
     id: async(form: { elements: { namedItem: (arg0: string) => { value: string; }; }; }) => {
-      const id = form.elements.namedItem("id").value;
-      const valid = await validate("id", id);
-      valid.result && await save2Collection("id", "b_user_id", {value: id, public: true});
+      const value = form.elements.namedItem("id-value").value;
+      const valid = await validate("id", value, false );
+      valid.result && await save2Collection("id", "b_user_id", {value: value, public: true});
       return valid;
     },
     name: async(form: { elements: { namedItem: (arg0: string) => { value: string; }; }; }) => {
-      const name = form.elements.namedItem("name").value;
-      await save2Collection("name", "b_user_name", {value: name, public: true})
-    }
+      const value = form.elements.namedItem("name-value").value;
+      const valid = await validate("name", value, false );
+      valid.result && await save2Collection("name", "b_user_name", {value: value, public: true});
+      return valid;
+    },
+    gender: async(form: { elements: { namedItem: (arg0: string) => {value: string; checked: boolean }; }; }) => {
+      const value = form.elements.namedItem("gender-value").value;
+      const publicChecked = form.elements.namedItem("gender-public").checked;
+      await save2Collection("gender", "b_user_gender", {value: value, public: publicChecked});
+      return { result: true };
+    },
+    birthdate: async(form: { elements: { namedItem: (arg0: string) => { value: string; checked: boolean}; }; }) => {
+      const value = form.elements.namedItem("birthdate-value").value;
+      const publicChecked = form.elements.namedItem("birthdate-public").checked;
+      const valid = await validate("birthdate", value, false );
+      valid.result && await save2Collection("birthdate", "b_user_birthdate", {value: value, public: publicChecked});
+      return valid;
+    },
+    residenceRegion: async(form: { elements: { namedItem: (arg0: string) => {value: string; checked: boolean; }; }; }) => {
+      const value = form.elements.namedItem("residenceRegion-value").value;
+      const publicChecked = form.elements.namedItem("residenceRegion-public").checked;
+      await save2Collection("residenceRegion", "b_user_residenceRegion", {value: value, public: publicChecked});
+      return { result: true };
+    },
   };
 
   async function save2Collection(configName: string, collectionName: string, doc: { [key: string]: string | number | boolean }) {
@@ -293,17 +425,35 @@ const ProfileModule = (props: Props) => {
     setSaving(true);
     await addDocument(collectionName, doc)
       .then(async () => {
-        //userProfileItem[event.detail.field.id] = doc;
         refreshCurrentUserProfile(configName);
-        setField[configName]();
+        //setField[configName]();
         setSaving(false);
       })
       .catch((error) => {
         console.error("保存中にエラーが発生しました:", error);
         setSaving(false);
-      });
-    
+      });  
   }
+
+  useEffect(() => {
+    (async () => {
+      const subregions = await loadArrayFromJSON("/subregions.json");
+      setSubregions(subregions);
+    })();
+    refreshCurrentUserProfile();
+    setLoading(false);
+  },[]);
+
+  useEffect(() => {
+    setUserProfileItem({
+      ...userProfileItem,
+      id: getCurrentUserProfile(document.id, altUserId),
+      name: getCurrentUserProfile(document.name, altUserName),
+      gender: getCurrentUserProfile(document.gender, 0),
+      birthdate: getCurrentUserProfile(document.birthdate, "2000-01-01"),
+      residenceRegion: getCurrentUserProfile(document.residenceRegion, "030"),
+    })
+  },[document]);
 
   return (
     <>
@@ -318,32 +468,75 @@ const ProfileModule = (props: Props) => {
             <h3>ユーザーID</h3>
             {
             <EditableFields
-              field={idField}
+              field={field.id}
               isPublic={userProfileItem.id.public===true}
               userLoggedIn={props.uid!==""}
               validate={validate}
               save={handleSave.id}
-              startEditing={setField.id}
+              //startEditing={setField.id}
             >
               <span>{userProfileItem.id.public ? "公開" : "非公開"}</span>
               {userProfileItem.id.value}
             </EditableFields> }
           </section>
           <section>
-          <h3>ユーザー名</h3>
+            <h3>ユーザー名</h3>
             {
             <EditableFields
-              field={nameField}
+              field={field.name}
               isPublic={userProfileItem.name.public===true}
               userLoggedIn={props.uid!==""}
               save={handleSave.name}
-              startEditing={setField.name}
+              //startEditing={setField.name}
             >
               <span>{userProfileItem.name.public ? "公開" : "非公開"}</span>
               {userProfileItem.name.value}
             </EditableFields> }
-
           </section>
+          <section>
+            <h3>性別</h3>
+            {
+            <EditableFields
+              field={field.gender}
+              isPublic={userProfileItem.gender.public===true}
+              userLoggedIn={props.uid!==""}
+              validate={validate}
+              save={handleSave.gender}
+            >
+              <span>{userProfileItem.gender.public ? "公開" : "非公開"}</span>
+              {getLabelFromCode(GENDER_CODES, Number(userProfileItem.gender.value), "ja")}
+            </EditableFields> }
+          </section>
+          <section>
+            <h3>生年月日</h3>
+            {
+              <EditableFields
+              field={field.birthdate}
+              isPublic={userProfileItem.birthdate.public===true}
+              userLoggedIn={props.uid!==""}
+              validate={validate}
+              save={handleSave.birthdate}
+              //startEditing={setField.name}
+            >
+              <span>{userProfileItem.birthdate.public ? "公開" : "非公開"}</span>
+              {formatDate(userProfileItem.birthdate.value as string, "ja")}
+            </EditableFields> }
+          </section>
+          <section>
+            <h3>在住地域</h3>
+            {
+            <EditableFields
+              field={field.residenceRegion}
+              isPublic={userProfileItem.residenceRegion.public===true}
+              userLoggedIn={props.uid!==""}
+              validate={validate}
+              save={handleSave.residenceRegion}
+            >
+              <span>{userProfileItem.residenceRegion.public ? "公開" : "非公開"}</span>
+              {subregions && getLabelFromCode(subregions, userProfileItem.residenceRegion.value as string,"ja")}
+            </EditableFields> }
+          </section>
+
         </article>
       )}
     </>

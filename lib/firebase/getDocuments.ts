@@ -4,6 +4,7 @@ import type { DocumentData } from "firebase/firestore";
 export async function getDocuments(
   configs: GetCollectionConfig[]
 ): Promise<DocumentData[]> {
+  console.log("configs",configs)
   try {
     const response = await fetch("/api/getDocuments", {
       method: "POST",

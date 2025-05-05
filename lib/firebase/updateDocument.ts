@@ -3,10 +3,20 @@ import { doc, updateDoc } from "firebase/firestore";
 import { checkLogin, loginInfo } from "@/lib/checkLogin";
 
 export async function updateDocument(
-  collection_name: string,
+  collectionName: string,
   documentId: string,
-  document: Record<string, unknown>
+  updateData: { status: string, updatedAt: Date }
 ) {
+  await fetch("/api/updateDocument", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      collectionName: collectionName,
+      documentId: documentId,
+      updateData: updateData
+    }),
+  });
+/*
   try {
     await checkLogin();
     const uid = loginInfo.uid;
@@ -34,5 +44,5 @@ export async function updateDocument(
         }
       };
     }
-  }
+  }*/
 }

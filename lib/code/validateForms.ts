@@ -1,9 +1,11 @@
 import { getDocuments } from "@/lib/firebase/getDocuments";
 import type { GetCollectionConfig } from "@/types/getDocumentsConfig";
+import { isDateInputSupported } from "../util";
 
 export const validateForms = async (
   id: string,
   value: string | number | boolean,
+  saveOnly: boolean, // 保存時のみで onChange には反応しない
   uid?: string | undefined
 ) => {
   const execute: {
@@ -12,7 +14,7 @@ export const validateForms = async (
       message?: string | undefined;
     }>;
   } = {
-    email: async() => {
+    email: async () => {
       if (!/^[\w.+-]+@([\w-]+\.)+[\w-]{2,}$/.test(value as string)) {
         return {
           result: false,
@@ -20,46 +22,52 @@ export const validateForms = async (
         };
       } else {
         return {
-          result: true
+          result: true,
         };
       }
     },
-    password: async() => {
-      if (!/^[A-Za-z\d!"#$%&'()*+,-./:;<=>?@[\]^_`{|}~]{8,}$/.test(value as string)) {
-          return {
+    password: async () => {
+      if (
+        !/^[A-Za-z\d!"#$%&'()*+,-./:;<=>?@[\]^_`{|}~]{8,}$/.test(
+          value as string
+        )
+      ) {
+        return {
           result: false,
-          message: "半角英数記号による最低 8 文字のパスワードを設定してください。"
-        }
+          message:
+            "半角英数記号による最低 8 文字のパスワードを設定してください。",
+        };
       } else {
         return {
-          result: true
-        }
+          result: true,
+        };
       }
     },
     id: async () => {
-      console.log(value)
-      if (uid === undefined  ) {
+      if (uid === undefined) {
         return {
           result: false,
-          message: "システムエラー：UID が不明です。"
-        }
+          message: "システムエラー：UID が不明です。",
+        };
       }
+      let duplicateItems: {
+        public: boolean;
+        value: string | number | boolean;
+      }[] = [];
       const duplicateIdConfig: GetCollectionConfig = {
         collectionName: "b_user_id",
-        conditions: uid === "signup" ? [
-          { name: "value", operator: "==", value: value },
-        ]: [
-          { name: "value", operator: "==", value: value },
-          { name: "uid", operator: "!=", value: uid },
-        ],
+        conditions:
+          uid === "signup"
+            ? [{ name: "value", operator: "==", value: value }]
+            : [
+                { name: "value", operator: "==", value: value },
+                { name: "uid", operator: "!=", value: uid },
+              ],
       };
-
-      console.log(duplicateIdConfig)
-      const duplicateItems = (await getDocuments([
-        duplicateIdConfig,
-      ])) as Array<{ public: boolean; value: string | number | boolean }>;
-
-      console.log("duplicateItems", id, duplicateItems);
+      duplicateItems = (await getDocuments([duplicateIdConfig])) as Array<{
+        public: boolean;
+        value: string | number | boolean;
+      }>;
       if (/[^a-zA-Z0-9_]/.test(value as string)) {
         return {
           result: false,
@@ -69,6 +77,27 @@ export const validateForms = async (
         return {
           result: false,
           message: `このユーザー ID は、他のユーザーがすでに使用しています。`,
+        };
+      } else {
+        return {
+          result: true,
+        };
+      }
+    },
+    name: async () => {
+      return {
+        result: true,
+      };
+    },
+    birthdate: async () => {
+      if (isDateInputSupported()) {
+        return {
+          result: true,
+        }
+      } else if (!/^\d{4}-\d{2}-\d{2}$/.test(value as string)) {
+        return {
+          result: false,
+          message: "ハイフン区切りの日付の書式で入力してください。yyyy-mm-dd",
         };
       } else {
         return {

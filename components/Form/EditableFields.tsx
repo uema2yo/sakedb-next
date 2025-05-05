@@ -4,14 +4,14 @@ import React, { useState, useEffect, useRef } from "react";
 interface Props {
   field: {
     id: string;
-    collectionName: string;
+    //collectionName: string;
     fields: (
       | {
           name: string;
           type: string;
-          value: string | number | boolean;
+          checked: boolean;
+
           disabled: boolean;
-          label: string;
         }
       | {
           name: string;
@@ -24,13 +24,14 @@ interface Props {
   userLoggedIn: boolean;
   validate?: (
     id: string,
-    value: string | number | boolean
+    value: string | number | boolean,
+    onSave: boolean
   ) => Promise<{
     result: boolean;
     message?: string | undefined;
   }>;
   save: Function;
-  startEditing: Function;
+  //startEditing: Function;
   children?: React.ReactNode;
 }
 
@@ -41,25 +42,65 @@ const EditableFields = (props: Props) => {
     JSON.parse(JSON.stringify(field.fields))
   );
   const [submitDisabled, setSubmitDisabled] = useState(true);
-  const [errorMessage, setErrorMessage] = useState<string | null | undefined>("");
+  const [errorMessage, setErrorMessage] = useState<string | null | undefined>(
+    ""
+  );
   const inputElements = useRef(new Array(field.fields.length));
-
+  const selectElements = useRef(new Array(field.fields.length));
   const startEditing = () => {
-    props.startEditing();
+    //props.startEditing();
     setIsEditing(true);
     setEditedFields(JSON.parse(JSON.stringify(field.fields)));
+    console.log("editedFields",editedFields)
   };
 
-  const handleChangeText = async(i: number, event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChangeSelect = async (
+    i: number,
+    event: React.ChangeEvent<HTMLSelectElement>
+  ) => {
+    //const prevFields = field.fields;
+    const newFields = [...editedFields];
+    const value = event.target.value;
+
+    newFields[i] = {
+      ...newFields[i],
+      value: value,
+    };
+    setEditedFields(newFields);
+    setSubmitDisabled(false);
+  };
+
+  const handleChangeCheckbox = async (
+    i: number,
+    event: React.ChangeEvent<HTMLInputElement>    
+  ) => {
+    const newFields = [...editedFields];
+    const checked = event.target.checked;
+
+    newFields[i] = {
+      ...newFields[i],
+      checked: checked,
+    };
+
+    setEditedFields(newFields);
+    setSubmitDisabled(false);
+  };
+
+  const handleChangeText = async (
+    i: number,
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
     const prevFields = field.fields;
     const newFields = [...editedFields];
     const value = event.target.value;
-    const validate = () => {
+    const validate = (saveOnly: boolean) => {
       if (prevFields !== newFields) {
-        return props.validate && props.validate(props.field.id, value);
+        return (
+          props.validate && props.validate(props.field.id, value, saveOnly)
+        );
       }
-    }
-    const validateResult = validate();
+    };
+    const validateResult = validate(false);
 
     newFields[i] = {
       ...newFields[i],
@@ -77,18 +118,28 @@ const EditableFields = (props: Props) => {
     }
   };
 
-  const handleSave = async(event: React.FormEvent<HTMLFormElement>) => {
+  const handleSave = async (event: React.FormEvent<HTMLFormElement>) => {
     const form = event.target as HTMLFormElement;
     const save = await props.save(form);
     if (save.result) {
       setIsEditing(false);
     } else {
-      setErrorMessage(save.message)
+      setErrorMessage(save.message);
     }
-  }
+  };
+
   const cancelEdit = () => {
     setIsEditing(false);
   };
+
+  useEffect(() => {
+    const value = field.fields.find((field) => field.name === "value")?.value;
+    if (value === "") {
+      startEditing();
+    } else {
+      cancelEdit();
+    }
+  }, []);
 
   useEffect(() => {
     if (isEditing) {
@@ -108,10 +159,11 @@ const EditableFields = (props: Props) => {
           {editedFields?.map(
             (
               fieldData: {
+                name: string;
                 type: string;
-                selectName: string | undefined;
-                value: string | number | undefined;
-                chrcked: boolean;
+                //selectName: string | undefined;
+                value: string | number | boolean | undefined;
+                checked: boolean;
                 options: any[];
                 disabled: boolean | undefined;
                 label:
@@ -132,66 +184,53 @@ const EditableFields = (props: Props) => {
             ) => {
               switch (fieldData.type) {
                 case "select":
-                  return {
-                    /*
+                  return (
                     <select
                       key={i}
-                      id={`editable-input-${i}`}
-                      name={fieldData.selectName}
-                      ref={(el) => (inputElements.current[i] = el)}
-                      value={fieldData.value}
-                      onChange={}
+                      name={`${field.id}-${fieldData.name}`}
+                      id={`editable-select-${field.id}-${fieldData.name}`}
+                      ref={(el) => (selectElements.current[i as number] = el)}
+                      value={fieldData.value as number}
+                      onChange={e => handleChangeSelect(i as number, e)}
                     >
                       {fieldData.options.map(
                         (
                           option: {
-                            value:
-                              | string
-                              | number
-                              | readonly string[]
-                              | undefined;
-                            innerText:
-                              | string
-                              | number
-                              | boolean
-                              | React.ReactElement<
-                                  any,
-                                  string | React.JSXElementConstructor<any>
-                                >
-                              | Iterable<React.ReactNode>
-                              | React.ReactPortal
-                              | React.PromiseLikeOfReactNode
-                              | null
-                              | undefined;
+                            code: string | number | readonly string[] | undefined;
+                            label: Record<string, string>;
                           },
                           j: React.Key | null | undefined
                         ) => (
-                          <option key={j} value={option.value}>
-                            {option.innerText}
+                          <option key={j} value={option.code}>
+                            {option.label["ja"]}
                           </option>
                         )
                       )}
-                    </select> */
-                  };
+                    </select>
+                  );
+                  break;
+
                 case "checkbox":
                   return (
                     <div key={i}>
-                      {/*
+                      {
                       <input
                         type="checkbox"
-                        id={`editable-input-${i}`}
+                        name={`${field.id}-${fieldData.name}`}
+                        id={`editable-input-${field.id}-${fieldData.name}`}
                         disabled={fieldData.disabled}
-                        ref={(el) => (inputElements.current[i] = el)}
-                        checked={fieldData.value}
-                        onChange={}
-                      />*/}
+                        ref={(el) => (inputElements.current[i as number] = el)}
+                        checked={fieldData.checked}
+                        onChange={e => handleChangeCheckbox(i as number, e)}
+                      />}
                       {fieldData.label && (
-                        <label htmlFor={`editable-input-${i}`}>
+                        <label htmlFor={`editable-input-${field.id}`}>
                           {fieldData.label}
                         </label>
                       )}
                     </div>
                   );
+                  break;
                 case "radio":
                   return (
                     <div key={i}>
@@ -238,40 +277,51 @@ const EditableFields = (props: Props) => {
                       )}
                     </div>
                   );
+                  break;
                 case "date":
-                  return {
-                    /*
-                    <input
-                      key={i}
-                      type="date"
-                      id={`editable-input-${i}`}
-                      ref={(el) => (inputElements.current[i] = el)}
-                      value={fieldData.value}
-                      onKeyDown={(e) => e.key === "Enter" && handleSave()}
-                      onChange={}
-                    />*/
-                  };
+                  return (
+                    <div key={i}>
+                      {
+                        <input
+                          type="date"
+                          name={`${field.id}-${fieldData.name}`}
+                          id={`editable-input-${field.id}-${fieldData.name}`}
+                          ref={(el) =>
+                            (inputElements.current[i as number] = el)
+                          }
+                          value={fieldData.value as string}
+                          onChange={(e) => handleChangeText(i as number, e)}
+                        />
+                      }
+                      {errorMessage !== "" && <p>{errorMessage}</p>}
+                    </div>
+                  );
+                  break;
                 default:
                   return (
                     <div key={i}>
                       {
                         <input
                           type="text"
-                          name={field.id}
-                          id={`editable-input-${field.id}`}
-                          ref={el => (inputElements.current[i as number] = el)}
-                          value={fieldData.value ?? ""}
-                          //onKeyDown={ e => e.key === "Enter" && handleSave()}
-                          onChange={e => handleChangeText(i as number, e)}
+                          name={`${field.id}-${fieldData.name}`}
+                          id={`editable-input-${field.id}-${fieldData.name}`}
+                          ref={(el) =>
+                            (inputElements.current[i as number] = el)
+                          }
+                          value={fieldData.value as string ?? ""}
+                          onChange={(e) => handleChangeText(i as number, e)}
                         />
                       }
-                      {errorMessage !=="" && <p>{errorMessage}</p>}
+                      {errorMessage !== "" && <p>{errorMessage}</p>}
                     </div>
                   );
+                  break;
               }
             }
           )}
-          <button type="submit" disabled={submitDisabled}>Save</button>
+          <button type="submit" disabled={submitDisabled}>
+            Save
+          </button>
           <button type="button" onClick={cancelEdit}>
             Cancel
           </button>

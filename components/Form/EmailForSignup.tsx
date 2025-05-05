@@ -15,7 +15,7 @@ const EmailForSignup = () => {
 
   const handleChangeEmail = async(value: string) => {
     setEmail(value);
-    const validate = await validateForms("email", value)
+    const validate = await validateForms("email", value, false)
     if (validate.result) {
       setEmailDisabled(false);
       setErrorMessage("");
@@ -34,7 +34,7 @@ const EmailForSignup = () => {
       url: signupUrl,
       handleCodeInApp: true,
     };
-    const valid = await validateForms("email", email)
+    const valid = await validateForms("email", email, false)
     
     try {
       valid.result && await sendSignInLinkToEmail(auth, email, actionCodeSettings);
