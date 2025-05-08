@@ -8,7 +8,14 @@ export const GENDER_CODES = [
   { code: 9, label: {ja: "どちらでもない"} },
   { code: 0, label: {ja: "無回答"} },
 ] as const;
-export const DOMESTIC_REGION_CODES = [
+
+type DomesticRegion = {
+  code: number;
+  label: {[key: string]: string};
+  prefectureCodes: number[];
+};
+
+export const DOMESTIC_REGION_CODES: DomesticRegion[] = [
   { code: 1, label: {ja: "北海道"}, prefectureCodes: [1] },
   { code: 2, label: {ja: "東北"}, prefectureCodes: [2, 3, 4, 5, 6, 7] },
   { code: 3, label: {ja: "関東"}, prefectureCodes: [8, 9, 10, 11, 12, 13, 14] },

@@ -536,6 +536,20 @@ const ProfileModule = (props: Props) => {
               {subregions && getLabelFromCode(subregions, userProfileItem.residenceRegion.value as string,"ja")}
             </EditableFields> }
           </section>
+          <section>
+            <h3>在住国</h3>
+            {
+            <EditableFields
+              field={field.residenceRegion}
+              isPublic={userProfileItem.residenceRegion.public===true}
+              userLoggedIn={props.uid!==""}
+              validate={validate}
+              save={handleSave.residenceRegion}
+            >
+              <span>{userProfileItem.residenceRegion.public ? "公開" : "非公開"}</span>
+              {subregions && getLabelFromCode(subregions, userProfileItem.residenceRegion.value as string,"ja")}
+            </EditableFields> }
+          </section>
 
         </article>
       )}

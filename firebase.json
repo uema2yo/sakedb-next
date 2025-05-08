@@ -26,7 +26,10 @@
     },
     "firestore": {
       "host": "localhost",
-      "port": 8080
+      "port": 8080,
+      "rules": "firestore.rules",
+      "indexes": "firestore.indexes.json",
+      "storage": "./firestore-data"
     },
     "hosting": {
       "host": "localhost",

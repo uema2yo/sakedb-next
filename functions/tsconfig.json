@@ -5,15 +5,17 @@
     "moduleResolution": "node",
     "noImplicitReturns": true,
     "noUnusedLocals": true,
+    "baseUrl": "./src",
+    "paths": {
+      "@api/*": ["api/*"]
+    },
     "outDir": "lib",
     "rootDir": "src",
     "sourceMap": true,
     "strict": true,
     "target": "es2017",
     "skipLibCheck": true,
-    "lib": [
-      "es2017"
-    ],
+    "lib": ["es2017", "dom"],
     "forceConsistentCasingInFileNames": true,
     "noEmit": false,
     "incremental": true,
@@ -23,13 +25,6 @@
     "jsx": "preserve"
   },
   "compileOnSave": true,
-  "include": [
-    "src"
-  ],
-  "files": [
-    "src/index.ts"
-  ],
-  "exclude": [
-    "node_modules"
-  ]
+  "include": ["src"],
+  "exclude": ["node_modules"]
 }

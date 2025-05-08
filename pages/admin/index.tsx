@@ -6,7 +6,7 @@ import { auth, db } from "@/lib/firebase/init";
 import { addDocument } from "@/lib/firebase/addDocument";
 import { getDocuments } from "@/lib/firebase/getDocuments";
 // import { updateRegionCodes } from "@/lib/code/updateRegionCodes";
-// import { updateCountryCodes } from "@/lib/code/updateCountryCodes";
+import { updateCountryCodes } from "@/lib/code/updateCountryCodes";
 import { updatePrefectureCodes } from "@/lib/code/updatePrefectureCodes";
 import { updateCityCodes } from "@/lib/code/updateCityCodes";
 import type { LoginInfoProps } from "@/lib/checkLogin";
@@ -24,9 +24,9 @@ const apiImportHandler: MouseEventHandler<HTMLButtonElement> = async (e) => {
     // case "updateRegionCodes":
       // await updateRegionCodes();
       // break;
-    // case "updateCountryCodes":
-      // await updateCountryCodes();
-      // break;
+    case "updateCountryCodes":
+      await updateCountryCodes();
+      break;
     case "updatePrefectureCodes":
       updatePrefectureCodes();
       break;
@@ -133,6 +133,24 @@ const Admin = (props: Props) => {
               </button>
             </article>
             */}
+            <article>
+              <h2>国コード</h2>
+              <button
+                type="button"
+                name="updateCountryCodes"
+                onClick={apiImportHandler}
+              >
+                REST Countries API で上書きする
+              </button>
+              <button
+                type="button"
+                name="openCountryCodes"
+                onClick={openEditorHandler}
+                disabled={true}
+              >
+                手動編集画面を開く
+              </button>
+            </article>
             <article>
               <h2>都道府県コード</h2>
               <button

@@ -15,6 +15,7 @@ export async function updatePrefectureCodes() {
     const prefectures = await prefecture.json();
 
     prefectures.forEach((r: { code: number; name: string }) => {
+      
 			// ハードコーディングした地方コードを反映させる
       const domesticRegionCode = DOMESTIC_REGION_CODES.filter(
         (domesticRegion) => domesticRegion.prefectureCodes.includes(r.code)
