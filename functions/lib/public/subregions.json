@@ -1,141 +1,15 @@
 [
   {
-    "code": "000",
+    "code": "015",
     "label": {
-      "ja": "無回答"
-    }
-  },
-  {
-    "code": "002",
-    "label": {
-      "en": "Africa",
-      "ja": "アフリカ",
-      "fr": "Afrique",
-      "es": "África",
-      "zh": "非洲",
-      "ko": "아프리카"
-    }
-  },
-  {
-    "code": "019",
-    "label": {
-      "en": "Americas",
-      "ja": "アメリカ大陸",
-      "fr": "Amériques",
-      "es": "Américas",
-      "zh": "美洲",
-      "ko": "아메리카"
-    }
-  },
-  {
-    "code": "010",
-    "label": {
-      "en": "Antarctica",
-      "ja": "南極",
-      "fr": "Antarctique",
-      "es": "Antártida",
-      "zh": "南极洲",
-      "ko": "남극"
-    }
-  },
-  {
-    "code": "053",
-    "label": {
-      "en": "Australia and New Zealand",
-      "ja": "オーストラリアおよびニュージーランド",
-      "fr": "Australie et Nouvelle-Zélande",
-      "es": "Australia y Nueva Zelanda",
-      "zh": "澳新地区",
-      "ko": "오스트레일리아 및 뉴질랜드"
-    }
-  },
-  {
-    "code": "029",
-    "label": {
-      "en": "Caribbean",
-      "ja": "カリブ",
-      "fr": "Caraïbes",
-      "es": "Caribe",
-      "zh": "加勒比地区",
-      "ko": "카리브해"
-    }
-  },
-  {
-    "code": "013",
-    "label": {
-      "en": "Central America",
-      "ja": "中央アメリカ",
-      "fr": "Amérique centrale",
-      "es": "América Central",
-      "zh": "中美洲",
-      "ko": "중앙아메리카"
-    }
-  },
-  {
-    "code": "143",
-    "label": {
-      "en": "Central Asia",
-      "ja": "中央アジア",
-      "fr": "Asie centrale",
-      "es": "Asia Central",
-      "zh": "中亚",
-      "ko": "중앙아시아"
-    }
-  },
-  {
-    "code": "014",
-    "label": {
-      "en": "Eastern Africa",
-      "ja": "東アフリカ",
-      "fr": "Afrique de l'Est",
-      "es": "África oriental",
-      "zh": "东非",
-      "ko": "동아프리카"
-    }
-  },
-  {
-    "code": "030",
-    "label": {
-      "en": "Eastern Asia",
-      "ja": "東アジア",
-      "fr": "Asie de l'Est",
-      "es": "Asia Oriental",
-      "zh": "东亚",
-      "ko": "동아시아"
-    }
-  },
-  {
-    "code": "151",
-    "label": {
-      "en": "Eastern Europe",
-      "ja": "東ヨーロッパ",
-      "fr": "Europe de l'Est",
-      "es": "Europa Oriental",
-      "zh": "东欧",
-      "ko": "동유럽"
-    }
-  },
-  {
-    "code": "054",
-    "label": {
-      "en": "Melanesia",
-      "ja": "メラネシア",
-      "fr": "Mélanésie",
-      "es": "Melanesia",
-      "zh": "美拉尼西亚",
-      "ko": "멜라네시아"
-    }
-  },
-  {
-    "code": "057",
-    "label": {
-      "en": "Micronesia",
-      "ja": "ミクロネシア",
-      "fr": "Micronésie",
-      "es": "Micronesia",
-      "zh": "密克罗尼西亚",
-      "ko": "미크로네시아"
-    }
+      "en": "Northern Africa",
+      "ja": "北アフリカ",
+      "fr": "Afrique du Nord",
+      "es": "África del Norte",
+      "zh": "北非",
+      "ko": "북아프リカ"
+    },
+    "order": "01"
   },
   {
     "code": "017",
@@ -146,106 +20,8 @@
       "es": "África central",
       "zh": "中非",
       "ko": "중부 아프리카"
-    }
-  },
-  {
-    "code": "015",
-    "label": {
-      "en": "Northern Africa",
-      "ja": "北アフリカ",
-      "fr": "Afrique du Nord",
-      "es": "África del Norte",
-      "zh": "北非",
-      "ko": "북아프リカ"
-    }
-  },
-  {
-    "code": "021",
-    "label": {
-      "en": "Northern America",
-      "ja": "北アメリカ",
-      "fr": "Amérique du Nord",
-      "es": "América del Norte",
-      "zh": "北美洲",
-      "ko": "북아메리카"
-    }
-  },
-  {
-    "code": "154",
-    "label": {
-      "en": "Northern Europe",
-      "ja": "北ヨーロッパ",
-      "fr": "Europe du Nord",
-      "es": "Europa del Norte",
-      "zh": "北欧",
-      "ko": "북유럽"
-    }
-  },
-  {
-    "code": "061",
-    "label": {
-      "en": "Polynesia",
-      "ja": "ポリネシア",
-      "fr": "Polynésie",
-      "es": "Polinesia",
-      "zh": "波利尼西亚",
-      "ko": "폴리네시아"
-    }
-  },
-  {
-    "code": "005",
-    "label": {
-      "en": "South America",
-      "ja": "南アメリカ",
-      "fr": "Amérique du Sud",
-      "es": "América del Sur",
-      "zh": "南美洲",
-      "ko": "남아메리카"
-    }
-  },
-  {
-    "code": "035",
-    "label": {
-      "en": "South-Eastern Asia",
-      "ja": "東南アジア",
-      "fr": "Asie du Sud-Est",
-      "es": "Sudeste Asiático",
-      "zh": "东南亚",
-      "ko": "동남아시아"
-    }
-  },
-  {
-    "code": "018",
-    "label": {
-      "en": "Southern Africa",
-      "ja": "南部アフリカ",
-      "fr": "Afrique australe",
-      "es": "África Meridional",
-      "zh": "南部非洲",
-      "ko": "남부 아프리카"
-    }
-  },
-  {
-    "code": "034",
-    "label": {
-      "en": "Southern Asia",
-      "ja": "南アジア",
-      "fr": "Asie du Sud",
-      "es": "Asia Meridional",
-      "zh": "南亚",
-      "ko": "남아시아"
-    }
-  },
-  {
-    "code": "039",
-    "label": {
-      "en": "Southern Europe",
-      "ja": "南ヨーロッパ",
-      "fr": "Europe du Sud",
-      "es": "Europa del Sur",
-      "zh": "南欧",
-      "ko": "남유럽"
-    }
+    },
+    "order": "02"
   },
   {
     "code": "011",
@@ -256,7 +32,44 @@
       "es": "África Occidental",
       "zh": "西非",
       "ko": "서아프リカ"
-    }
+    },
+    "order": "03"
+  },
+  {
+    "code": "014",
+    "label": {
+      "en": "Eastern Africa",
+      "ja": "東アフリカ",
+      "fr": "Afrique de l'Est",
+      "es": "África oriental",
+      "zh": "东非",
+      "ko": "동아프리카"
+    },
+    "order": "04"
+  },
+  {
+    "code": "018",
+    "label": {
+      "en": "Southern Africa",
+      "ja": "南部アフリカ",
+      "fr": "Afrique australe",
+      "es": "África Meridional",
+      "zh": "南部非洲",
+      "ko": "남부 아프리카"
+    },
+    "order": "05"
+  },
+  {
+    "code": "143",
+    "label": {
+      "en": "Central Asia",
+      "ja": "中央アジア",
+      "fr": "Asie centrale",
+      "es": "Asia Central",
+      "zh": "中亚",
+      "ko": "중앙아시아"
+    },
+    "order": "06"
   },
   {
     "code": "145",
@@ -267,7 +80,56 @@
       "es": "Asia Occidental",
       "zh": "西亚",
       "ko": "서아시아"
-    }
+    },
+    "order": "07"
+  },
+  {
+    "code": "030",
+    "label": {
+      "en": "Eastern Asia",
+      "ja": "東アジア",
+      "fr": "Asie de l'Est",
+      "es": "Asia Oriental",
+      "zh": "东亚",
+      "ko": "동아시아"
+    },
+    "order": "08"
+  },
+  {
+    "code": "034",
+    "label": {
+      "en": "Southern Asia",
+      "ja": "南アジア",
+      "fr": "Asie du Sud",
+      "es": "Asia Meridional",
+      "zh": "南亚",
+      "ko": "남아시아"
+    },
+    "order": "09"
+  },
+  {
+    "code": "035",
+    "label": {
+      "en": "South-Eastern Asia",
+      "ja": "東南アジア",
+      "fr": "Asie du Sud-Est",
+      "es": "Sudeste Asiático",
+      "zh": "东南亚",
+      "ko": "동남아시아"
+    },
+    "order": "10"
+  },
+  {
+    "code": "154",
+    "label": {
+      "en": "Northern Europe",
+      "ja": "北ヨーロッパ",
+      "fr": "Europe du Nord",
+      "es": "Europa del Norte",
+      "zh": "北欧",
+      "ko": "북유럽"
+    },
+    "order": "11"
   },
   {
     "code": "155",
@@ -278,6 +140,163 @@
       "es": "Europa Occidental",
       "zh": "西欧",
       "ko": "서유럽"
-    }
+    },
+    "order": "12"
+  },
+  {
+    "code": "100",
+    "label": {
+      "en": "Central Europe",
+      "ja": "中央ヨーロッパ",
+      "fr": "Europe centrale",
+      "es": "Europa Central",
+      "zh": "中欧",
+      "ko": "중앙유럽"
+    },
+    "order": "13"
+  },
+  {
+    "code": "101",
+    "label": {
+      "en": "Southeast Europe",
+      "ja": "南東ヨーロッパ",
+      "fr": "Europe du Sud-Est",
+      "es": "Sudeste de Europa",
+      "zh": "东南欧",
+      "ko": "동남유럽"
+    },
+    "order": "14"
+  },
+  {
+    "code": "151",
+    "label": {
+      "en": "Eastern Europe",
+      "ja": "東ヨーロッパ",
+      "fr": "Europe de l'Est",
+      "es": "Europa Oriental",
+      "zh": "东欧",
+      "ko": "동유럽"
+    },
+    "order": "15"
+  },
+  {
+    "code": "039",
+    "label": {
+      "en": "Southern Europe",
+      "ja": "南ヨーロッパ",
+      "fr": "Europe du Sud",
+      "es": "Europa del Sur",
+      "zh": "南欧",
+      "ko": "남유럽"
+    },
+    "order": "16"
+  },
+  {
+    "code": "021",
+    "label": {
+      "en": "North America",
+      "ja": "北アメリカ",
+      "fr": "Amérique du Nord",
+      "es": "América del Norte",
+      "zh": "北美洲",
+      "ko": "북아메리카"
+    },
+    "order": "17"
+  },
+  {
+    "code": "013",
+    "label": {
+      "en": "Central America",
+      "ja": "中央アメリカ",
+      "fr": "Amérique centrale",
+      "es": "América Central",
+      "zh": "中美洲",
+      "ko": "중앙아메리카"
+    },
+    "order": "18"
+  },
+  {
+    "code": "005",
+    "label": {
+      "en": "South America",
+      "ja": "南アメリカ",
+      "fr": "Amérique du Sud",
+      "es": "América del Sur",
+      "zh": "南美洲",
+      "ko": "남아메리카"
+    },
+    "order": "19"
+  },
+  {
+    "code": "029",
+    "label": {
+      "en": "Caribbean",
+      "ja": "カリブ",
+      "fr": "Caraïbes",
+      "es": "Caribe",
+      "zh": "加勒比地区",
+      "ko": "카리브해"
+    },
+    "order": "20"
+  },
+  {
+    "code": "053",
+    "label": {
+      "en": "Australia and New Zealand",
+      "ja": "オーストラリアおよびニュージーランド",
+      "fr": "Australie et Nouvelle-Zélande",
+      "es": "Australia y Nueva Zelanda",
+      "zh": "澳新地区",
+      "ko": "오스트레일리아 및 뉴질랜드"
+    },
+    "order": "21"
+  },
+  {
+    "code": "054",
+    "label": {
+      "en": "Melanesia",
+      "ja": "メラネシア",
+      "fr": "Mélanésie",
+      "es": "Melanesia",
+      "zh": "美拉尼西亚",
+      "ko": "멜라네시아"
+    },
+    "order": "22"
+  },
+  {
+    "code": "057",
+    "label": {
+      "en": "Micronesia",
+      "ja": "ミクロネシア",
+      "fr": "Micronésie",
+      "es": "Micronesia",
+      "zh": "密克罗尼西亚",
+      "ko": "미크로네시아"
+    },
+    "order": "23"
+  },
+  {
+    "code": "061",
+    "label": {
+      "en": "Polynesia",
+      "ja": "ポリネシア",
+      "fr": "Polynésie",
+      "es": "Polinesia",
+      "zh": "波利尼西亚",
+      "ko": "폴리네시아"
+    },
+    "order": "24"
+  },
+  {
+    "code": "999",
+    "label": {
+      "en": "Other regions",
+      "ja": "その他の地域",
+      "fr": "Autres régions",
+      "es": "Otras regiones",
+      "zh": "其他地区",
+      "ko": "기타 지역"
+    },
+    "order": "99"
   }
 ]

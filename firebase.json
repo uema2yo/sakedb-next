@@ -19,6 +19,11 @@
     "rules": "firestore.rules",
     "indexes": "firestore.indexes.json"
   },
+  "storage": {
+    "rules": "storage.rules",
+    "host": "localhost",
+    "port": 9199
+  },
   "emulators": {
     "auth": {
       "host": "localhost",

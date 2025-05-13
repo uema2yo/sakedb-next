@@ -8,20 +8,26 @@ import { validateForms } from "@/lib/code/validateForms";
 import { formatDate, generateUniqueToken, getLabelFromCode, loadArrayFromJSON } from "@/lib/util";
 import { GENDER_CODES } from "@/constants";
 import { sign } from "crypto";
+import { DocumentData } from "firebase/firestore";
 
 interface Props {
   uid: string;
 }
 
 interface UserProfileItem {
-  [key: string]: { 
-    public: boolean; 
+  [key: string]: {
+    public: boolean;
     value:  boolean | string | number;
+    //defaultEditMode?: boolean;
   };
 }
 
+// 初期 ID/ユーサー名
+const altUserId = `user-${generateUniqueToken(12)}`;
+const altUserName = `ユーザー${generateUniqueToken(6)}`;
+
+
 const ProfileModule = (props: Props) => {
-  console.log(props)
   const profileConfig: {
     [key: string]: GetCollectionConfig
   } = {
@@ -82,230 +88,207 @@ const ProfileModule = (props: Props) => {
 			limit_num: 1
 		}
 	};
-  // 初期 ID/ユーサー名
-  const altUserId = `user-${generateUniqueToken(12)}`;
-  const altUserName = `ユーザー${generateUniqueToken(6)}`;
+//const altUserId = `user-${generateUniqueToken(12)}`;
+//const altUserName = `ユーザー${generateUniqueToken(6)}`;
 
-  const [userProfileItem, setUserProfileItem] = useState<UserProfileItem>(
-    {
-      id: { public: true, value: altUserId },
-      name: { public: true, value: altUserName },
-      gender: { public: true, value: 0 },
-      birthdate: { public: false, value: 0 },
-      residenceRegion: { public: true, value: 0 },
-      residenceCountry: { public: false, value: 0 },
-      residencePrefecture: { public: false, value: 0 },
-      residenceCity: { public: false, value: 0 },
-      favoriteRegion: { public: false, value: 0 },
-      favoriteCountry: { public: false, value: 0 },
-      favoritePrefecture: { public: false, value: 0 },
-      favoriteCity: { public: false, value: 0 },  
-    }
-  )
+
+  //const [altUserId, setAltUserId] = useState(`user-${generateUniqueToken(12)}`);
+  //const [altUserName, setUserName] = useState(`ユーザー${generateUniqueToken(6)}`);
+  const [userProfileItem, setUserProfileItem] = useState<UserProfileItem>({});
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [subregions, setSubregions] = useState<{code: number,label: Record<string, string>;}[]>();
+  const [subregions, setSubregions] = useState<DocumentData[]>();
+  const [countries, setCountries] = useState<DocumentData[]>();
+  const [prefectures, setPrefectures] = useState<DocumentData[]>();
+  const [cities, setCities] = useState<DocumentData[]>();
+  const [document, setDocument] = useState<Record<string, { public: boolean; value: string | number | boolean }>>({
+/*    id: {
+      public: true,
+      value: altUserId
+    },
+    name: {
+      public: true,
+      value: altUserName
+    },
+    gender: {
+      public: false,
+      value: 0
+    },
+    birthdate: {
+      public: false,
+      value: "2000-01-01"
+    },
+    residenceRegion: {
+      public: true,
+      value: "00"
+    },
+    residenceCountry: {
+      public: true,
+      value: "00"
+    },
+    residencePrefecture: {
+      public: true,
+      value: "00"
+    },
+    residenceCity: {
+      public: true,
+      value: "00"
+    }*/
+  });
 
   const field = {
     id: {
       id: "id",
-      //collectionName: "b_user_id",
       fields: [
         {
           name: "public",
           type: "checkbox",
-          checked: userProfileItem.id.public as boolean,
+          //checked: document.id?.public,
+          checked: userProfileItem.id?.public as boolean,
           disabled: true,
         },
         { name: "value",
           type: "text",
-          value: userProfileItem.id.value
+          //value: document.id?.value
+          value: userProfileItem.id?.value
         },
       ],
     },
     name: {
       id: "name",
-      //collectionName: "b_user_name",
       fields: [
         {
           name: "public",
           type: "checkbox",
-          checked: userProfileItem.name.public,
+          checked: userProfileItem.name?.public,
           disabled: true,
         },
         { name: "value",
           type: "text",
-          value: userProfileItem.name.value
+          value: userProfileItem.name?.value
         },
       ],
     },
     gender: {
       id: "gender",
-      //collectionName: "b_user_gender",
       fields: [
         {
           name: "public",
           type: "checkbox",
-          checked: userProfileItem.gender.public,
+          checked: userProfileItem.gender?.public,
           disabled: false,
         },
         {
           name: "value",
           type: "select",
-          value: userProfileItem.gender.value,
+          value: userProfileItem.gender?.value,
           options: GENDER_CODES,
         },
       ],
     },
     birthdate: {
       id: "birthdate",
-      //collectionName: "b_user_birthdate",
       fields: [
         {
           name: "public",
           type: "checkbox",
-          checked: userProfileItem.birthdate.public,
+          checked: userProfileItem.birthdate?.public,
           disabled: false,
         },
         { name: "value",
           type: "date",
-          value: userProfileItem.birthdate.value },
+          value: userProfileItem.birthdate?.value },
       ],
     },
     residenceRegion: {
       id: "residenceRegion",
-      //collectionName: "b_user_residenceRegion",
       fields: [
         {
           name: "public",
           type: "checkbox",
-          checked: userProfileItem.residenceRegion.public,
+          checked: userProfileItem.residenceRegion?.public,
           disabled: false,
         },
         {
           name: "value",
           type: "select",
-          value: userProfileItem.residenceRegion.value,
+          value: userProfileItem.residenceRegion?.value,
           options: subregions,
         },
       ],
     },
+    residenceCountry: {
+      id: "residenceCountry",
+      fields: [
+        {
+          name: "public",
+          type: "checkbox",
+          checked: userProfileItem.residenceCountry?.public,
+          disabled: false,
+        },
+        {
+          name: "value",
+          type: "select",
+          value: userProfileItem.residenceCountry?.value,
+          options: countries,
+        },
+      ],
+    },
+    residencePrefecture: {
+      id: "residencePrefecture",
+      fields: [
+        {
+          name: "public",
+          type: "checkbox",
+          checked: userProfileItem.residencePrefecture?.public,
+          disabled: false,
+        },
+        {
+          name: "value",
+          type: "select",
+          value: userProfileItem.residencePrefecture?.value,
+          options: prefectures,
+        },
+      ],
+    },
+    residenceCity: {
+      id: "residenceCity",
+      fields: [
+        {
+          name: "public",
+          type: "checkbox",
+          checked: userProfileItem.residenceCity?.public,
+          disabled: false,
+        },
+        {
+          name: "value",
+          type: "select",
+          value: userProfileItem.residenceCity?.value,
+          options: cities,
+        },
+      ],
+    },
   };
-/*
-  const [nameField, setNameField] = useState({
-    id: "name",
-    collectionName: "b_user_name",
-    fields: [
-      {
-        name: "public",
-        type: "checkbox",
-        value: userProfileItem.name.public,
-        disabled: true,
-        label: "公開",
-      },
-      { name: "value", type: "text", value: userProfileItem.name.value },
-    ]
-  });
-
-  const [genderField, setGenderField] = useState({
-    id: "name",
-    collectionName: "b_user_gender",
-    fields: [
-      {
-        name: "public",
-        type: "checkbox",
-        value: userProfileItem.gender.public,
-        disabled: false,
-        label: "",
-      },
-      { name: "value", type: "text", value: userProfileItem.name.value },
-    ]
-  });
-  */
-  /*
-  const [idField, setIdField] = useState({
-    id: "id",
-    collectionName: "b_user_id",
-    fields: [
-      {
-        name: "public",
-        type: "checkbox",
-        value: userProfileItem.id.public,
-        disabled: true,
-        label: "公開",
-      },
-      { name: "value", type: "text", value: userProfileItem.id.value },
-    ]
-  });
-
-  const [nameField, setNameField] = useState({
-    id: "name",
-    collectionName: "b_user_name",
-    fields: [
-      {
-        name: "public",
-        type: "checkbox",
-        value: userProfileItem.name.public,
-        disabled: true,
-        label: "公開",
-      },
-      { name: "value", type: "text", value: userProfileItem.name.value },
-    ]
-  });
-
-  const [genderField, setGenderField] = useState({
-    id: "name",
-    collectionName: "b_user_gender",
-    fields: [
-      {
-        name: "public",
-        type: "checkbox",
-        value: userProfileItem.gender.public,
-        disabled: false,
-        label: "",
-      },
-      { name: "value", type: "text", value: userProfileItem.name.value },
-    ]
-  });
-  */
-/*
-  const setField: { [key: string]: () => void } =  {
-    id: () => {
-      setUserProfileItem({
-        ...userProfileItem,
-        id: getCurrentUserProfile(document.id, altUserId),  
-      })
-    },
-    name: () => {
-      setUserProfileItem({
-        ...userProfileItem,
-        name: getCurrentUserProfile(document.name, altUserName),  
-      })
-    },
-    gender: () => {
-      setUserProfileItem({
-        ...userProfileItem,
-        name: getCurrentUserProfile(document.gender, 0),  
-      })
-    }
-  }*/
-
-  const [document, setDocument] = useState<Record<string, { public: boolean; value: string | number | boolean }>>({});
 
   const getCurrentUserProfile = (
     doc: { public: boolean; value: string | number | boolean },
     alt: string | number
   ) => {
+    console.log("getCurrentUserProfile", alt, doc && doc?.value,doc?.value === undefined);
     return {
       public: doc ? doc.public : false,
       value: doc ? doc.value : alt,
+      //defaultEditMode: doc?.value === undefined,
     };
   }
 
   async function refreshCurrentUserProfile(configName?: string | null) {
     let res: Array<{ public: boolean; value: string | number | boolean }> = [];
     if (configName && configName !== "") {
-      res = await getDocuments([profileConfig[configName]]) as Array<{ public: boolean; value: string | number | boolean }>;
+      res = (await getDocuments([profileConfig[configName]])) as Array<{
+        public: boolean;
+        value: string | number | boolean;
+      }>;
       setDocument(prev => ({
         ...prev,
         [configName]: res[0]
@@ -313,78 +296,84 @@ const ProfileModule = (props: Props) => {
     } else {
       let updatedDoc = { ...document };
       for (const [name, config] of Object.entries(profileConfig)) {
-        res = await getDocuments([config]) as Array<{ public: boolean; value: string | number | boolean }>;
+        res = (await getDocuments([config])) as Array<{
+          public: boolean;
+          value: string | number | boolean;
+        }>;
         updatedDoc[name] = res[0];
       }
       setDocument(updatedDoc);
     }
-    /*
-    userProfileItem.name = getCurrentUserProfile(document.name, "名無し");
-		userProfileItem.gender = getCurrentUserProfile(document.gender, 0);
-		userProfileItem.birthdate = getCurrentUserProfile(
-			document.birthdate,
-			getFormatedDate(getDateOffset("years", 30))
-		);
-		userProfileItem.residenceRegion = getCurrentUserProfile(document.residenceRegion, 1);
-		userProfileItem.residenceCountry = getCurrentUserProfile(
-			document.residenceCountry,
-			userProfileItem.residenceRegion.value === 1 ? 192 : 0
-		);
-
-		console.log(
-			"userProfileItem.residenceRegion ",
-			document,
-			userProfileItem.residenceRegion,
-			userProfileItem.residenceCountry
-		);
-
-		userProfileItem.residencePrefecture = getCurrentUserProfile(document.residencePrefecture, 0);
-		userProfileItem.residenceCity = getCurrentUserProfile(document.residenceCity, 0);
-		const currentUserGenderFormat = genderOptions.find(
-			(genderOption) => genderOption.value === userProfileItem.gender.value
-		);
-		userProfileItem.gender.format = currentUserGenderFormat && currentUserGenderFormat.label;
-		userProfileItem.birthdate.format = getFormatedDate(userProfileItem.birthdate.value, "ja");
-
-		//Region
-		const residenceRegionFormat = residenceRegionOptions.find(
-			(regionOption) => regionOption.value === userProfileItem.residenceRegion.value
-		);
-		userProfileItem.residenceRegion.format =
-			residenceRegionFormat && residenceRegionFormat.innerText;
-
-		//country
-		residenceCountryOptions = await getCountryOptions(userProfileItem.residenceRegion.value);
-		const residenceCountryFormat = residenceCountryOptions.find(
-			(countryOption) => countryOption.value === userProfileItem.residenceCountry.value
-		);
-		userProfileItem.residenceCountry.format = residenceCountryFormat
-			? residenceCountryFormat.innerText
-			: "----";
-
-		//prefecture
-		const residencePrefectureFormat = residencePrefectureOptions.find(
-			(prefectureOption) => prefectureOption.value === userProfileItem.residencePrefecture.value
-		);
-		userProfileItem.residencePrefecture.format =
-			residencePrefectureFormat && residencePrefectureFormat.innerText;
-
-		//city
-		residenceCityOptions = await getCityOptions(userProfileItem.residencePrefecture.value);
-		const residenceCityFormat = residenceCityOptions.find(
-			(cityOption) => cityOption.value === userProfileItem.residenceCity.value
-		);
-		userProfileItem.residenceCity.format = residenceCityFormat
-			? residenceCityFormat.innerText
-			: "----";
-    */
-
     setLoading(false);
   }
 
   const validate = async(id: string, value: string | number | boolean, saveOnly:boolean ) => {
     return await validateForms( id, value, saveOnly, props.uid);
   }
+
+  const setSelectOptionItems = {
+    region: async () => {
+      const subregionConfigs: GetCollectionConfig[] = [{
+        collectionName: "b_code_region",
+        order_by: {field: "order", direction: "asc"}
+      }];
+      const subregionItems = await getDocuments(subregionConfigs);
+      setSubregions(subregionItems);
+    },
+    country: async() => {
+      const configs: GetCollectionConfig[] = [{
+        collectionName: "b_code_country",
+        conditions: [{ name: "subregion", operator: "==", value: document.residenceRegion?.value || "030" }],
+      }];
+      const items = await getDocuments(configs);
+      setCountries(items);
+    },
+    prefecture: async() => {
+      const configs: GetCollectionConfig[] = [{
+        collectionName: "b_code_prefecture",
+        order_by: {field: "order", direction: "asc"}
+      }];
+      const items = await getDocuments(configs);
+      setPrefectures(items);
+    },
+    city: async() => {
+      const configs: GetCollectionConfig[] = [{
+        collectionName: "b_code_city",
+        conditions: [{ name: "prefecture", operator: "==", value: Number(document.residencePrefecture?.value) || 13 }],
+        order_by: {field: "code", direction: "asc"}
+      }];
+      const items = await getDocuments(configs);
+      console.log("cities", items,document.residencePrefecture?.value)
+      setCities(items);
+    }
+  }
+/*
+  const refreshRegidenceCountry = async() => {
+    const configs: GetCollectionConfig[] = [{
+      collectionName: "b_code_country",
+      conditions: [{ name: "subregion", operator: "==", value: document.residenceRegion?.value || "030" }],
+    }];
+    const items = await getDocuments(configs);
+    setCountries(items);
+  }
+  const refreshRegidencePrefecture = async() => {
+    const configs: GetCollectionConfig[] = [{
+      collectionName: "b_code_city",
+      conditions: [{ name: "prefecture", operator: "==", value: document.residencePrefecturee?.value || "13" }],
+    }];
+    const items = await getDocuments(configs);
+    setPrefectures(items);
+  }
+
+  const handleEditing = {
+    residenceCountry: () => {
+      refreshRegidenceCountry();
+    },
+    residencePrefecture: () => {
+      refreshRegidencePrefecture();
+    }
+  }
+*/
 
   const handleSave = {
     id: async(form: { elements: { namedItem: (arg0: string) => { value: string; }; }; }) => {
@@ -418,6 +407,24 @@ const ProfileModule = (props: Props) => {
       await save2Collection("residenceRegion", "b_user_residenceRegion", {value: value, public: publicChecked});
       return { result: true };
     },
+    residenceCountry: async(form: { elements: { namedItem: (arg0: string) => {value: string; checked: boolean; }; }; }) => {
+      const value = form.elements.namedItem("residenceCountry-value").value;
+      const publicChecked = form.elements.namedItem("residenceCountry-public").checked;
+      await save2Collection("residenceCountry", "b_user_residenceCountry", {value: value, public: publicChecked});
+      return { result: true };
+    },
+    residencePrefecture: async(form: { elements: { namedItem: (arg0: string) => {value: string; checked: boolean; }; }; }) => {
+      const value = form.elements.namedItem("residencePrefecture-value").value;
+      const publicChecked = form.elements.namedItem("residencePrefecture-public").checked;
+      await save2Collection("residencePrefecture", "b_user_residencePrefecture", {value: value, public: publicChecked});
+      return { result: true };
+    },
+    residenceCity: async(form: { elements: { namedItem: (arg0: string) => {value: string; checked: boolean; }; }; }) => {
+      const value = form.elements.namedItem("residenceCity-value").value;
+      const publicChecked = form.elements.namedItem("residenceCity-public").checked;
+      await save2Collection("residenceCity", "b_user_residenceCity", {value: value, public: publicChecked});
+      return { result: true };
+    },
   };
 
   async function save2Collection(configName: string, collectionName: string, doc: { [key: string]: string | number | boolean }) {
@@ -436,14 +443,22 @@ const ProfileModule = (props: Props) => {
   }
 
   useEffect(() => {
+    setSelectOptionItems.region();
+    setSelectOptionItems.country();
+    setSelectOptionItems.prefecture();
+    setSelectOptionItems.city();
+    /*
     (async () => {
-      const subregions = await loadArrayFromJSON("/subregions.json");
-      setSubregions(subregions);
-    })();
+      const subregionConfigs: GetCollectionConfig[] = [{
+        collectionName: "b_code_region"
+      }];
+      const subregionItems = await getDocuments(subregionConfigs);
+      setSubregions(subregionItems);
+    })();*/
     refreshCurrentUserProfile();
-    setLoading(false);
+    //refreshRegidenceCountry();
   },[]);
-
+ 
   useEffect(() => {
     setUserProfileItem({
       ...userProfileItem,
@@ -452,8 +467,19 @@ const ProfileModule = (props: Props) => {
       gender: getCurrentUserProfile(document.gender, 0),
       birthdate: getCurrentUserProfile(document.birthdate, "2000-01-01"),
       residenceRegion: getCurrentUserProfile(document.residenceRegion, "030"),
-    })
+      residenceCountry: getCurrentUserProfile(document.residenceCountry, "00"),
+      residencePrefecture: getCurrentUserProfile(document.residencePrefecture, "00"),
+      residenceCity: getCurrentUserProfile(document.residenceCity, "00"),
+    });
   },[document]);
+  
+  useEffect(() => {
+    setSelectOptionItems.country();
+  },[document.residenceRegion])
+
+  useEffect(() => {
+    setSelectOptionItems.city();
+  },[document.residencePrefecture])
 
   return (
     <>
@@ -462,7 +488,11 @@ const ProfileModule = (props: Props) => {
       ) : (
         <article>
           <h2>
-            {userProfileItem.name.value}（{userProfileItem.id.value}）さんのプロフィール
+            {(document.id?.value && document.name?.value) && 
+              <>
+              {document.name?.value}（{document.id?.value}）さんのプロフィール
+              </>
+            }
           </h2>
           <section>
             <h3>ユーザーID</h3>
@@ -472,8 +502,8 @@ const ProfileModule = (props: Props) => {
               isPublic={userProfileItem.id.public===true}
               userLoggedIn={props.uid!==""}
               validate={validate}
+              defaultEditMode={document.id?.value===undefined}
               save={handleSave.id}
-              //startEditing={setField.id}
             >
               <span>{userProfileItem.id.public ? "公開" : "非公開"}</span>
               {userProfileItem.id.value}
@@ -486,6 +516,7 @@ const ProfileModule = (props: Props) => {
               field={field.name}
               isPublic={userProfileItem.name.public===true}
               userLoggedIn={props.uid!==""}
+              defaultEditMode={document.name?.value===undefined}
               save={handleSave.name}
               //startEditing={setField.name}
             >
@@ -501,6 +532,7 @@ const ProfileModule = (props: Props) => {
               isPublic={userProfileItem.gender.public===true}
               userLoggedIn={props.uid!==""}
               validate={validate}
+              defaultEditMode={document.gender?.value===undefined}
               save={handleSave.gender}
             >
               <span>{userProfileItem.gender.public ? "公開" : "非公開"}</span>
@@ -515,6 +547,7 @@ const ProfileModule = (props: Props) => {
               isPublic={userProfileItem.birthdate.public===true}
               userLoggedIn={props.uid!==""}
               validate={validate}
+              defaultEditMode={document.birthdate?.value===undefined}
               save={handleSave.birthdate}
               //startEditing={setField.name}
             >
@@ -530,7 +563,10 @@ const ProfileModule = (props: Props) => {
               isPublic={userProfileItem.residenceRegion.public===true}
               userLoggedIn={props.uid!==""}
               validate={validate}
+              defaultEditMode={document.residenceRegion?.value===undefined}
               save={handleSave.residenceRegion}
+              default="00"
+              //editing={setSelectOptionItems.region}
             >
               <span>{userProfileItem.residenceRegion.public ? "公開" : "非公開"}</span>
               {subregions && getLabelFromCode(subregions, userProfileItem.residenceRegion.value as string,"ja")}
@@ -540,17 +576,53 @@ const ProfileModule = (props: Props) => {
             <h3>在住国</h3>
             {
             <EditableFields
-              field={field.residenceRegion}
-              isPublic={userProfileItem.residenceRegion.public===true}
+              field={field.residenceCountry}
+              isPublic={userProfileItem.residenceCountry.public===true}
               userLoggedIn={props.uid!==""}
               validate={validate}
-              save={handleSave.residenceRegion}
+              defaultEditMode={document.residenceCountry?.value===undefined}
+              save={handleSave.residenceCountry}
+              default="00"
+              //editing={handleEditing.residenceCountry}
             >
-              <span>{userProfileItem.residenceRegion.public ? "公開" : "非公開"}</span>
-              {subregions && getLabelFromCode(subregions, userProfileItem.residenceRegion.value as string,"ja")}
+              <span>{userProfileItem.residenceCountry.public ? "公開" : "非公開"}</span>
+              {countries && getLabelFromCode(countries, userProfileItem.residenceCountry.value as string, "ja")}
             </EditableFields> }
           </section>
-
+          <section>
+            <h3>在住都道府県</h3>
+            {
+            <EditableFields
+              field={field.residencePrefecture}
+              isPublic={userProfileItem.residencePrefecture.public===true}
+              userLoggedIn={props.uid!==""}
+              validate={validate}
+              defaultEditMode={document.residencePrefecture?.value===undefined}
+              save={handleSave.residencePrefecture}
+              default="00"
+              //editing={handleEditing.residencePrefecture}
+            >
+              <span>{userProfileItem.residencePrefecture.public ? "公開" : "非公開"}</span>
+              {prefectures && getLabelFromCode(prefectures, Number(userProfileItem.residencePrefecture.value), "ja")}
+            </EditableFields> }
+          </section>
+          <section>
+            <h3>在住市区町村</h3>
+            {
+            <EditableFields
+              field={field.residenceCity}
+              isPublic={userProfileItem.residenceCity.public===true}
+              userLoggedIn={props.uid!==""}
+              validate={validate}
+              defaultEditMode={document.residenceCity?.value===undefined}
+              save={handleSave.residenceCity}
+              default="00"
+              //editing={handleEditing.residencePrefecture}
+            >
+              <span>{userProfileItem.residenceCity.public ? "公開" : "非公開"}</span>
+              {cities && getLabelFromCode(cities, Number(userProfileItem.residenceCity.value), "ja")}
+            </EditableFields> }
+          </section>
         </article>
       )}
     </>

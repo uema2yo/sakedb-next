@@ -1,8 +1,10 @@
+import { DocumentData } from "firebase/firestore";
+
 export const SITE_TITLE = "SAKE DB";
 export const SUB_TITLE = "サブタイトル";
 export const DOMAIN = "http://localhost:3000"; // デプロイ後、ドメイン取得後に随時書き換え
 export const LOCAL_DOMAIN = "http://localhost:3000";
-export const GENDER_CODES = [
+export const GENDER_CODES:DocumentData[] = [
   { code: 1, label: {ja: "男性"} },
   { code: 2, label: {ja: "女性"} },
   { code: 9, label: {ja: "どちらでもない"} },

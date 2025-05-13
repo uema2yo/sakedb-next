@@ -14,7 +14,8 @@ import type { DocumentData } from "firebase/firestore";
 
 export async function updateCodes(
 	collectionName: string,
-	codes: { code: number | string; label: string }[]
+	//codes: { code: number | string; label: string | {[key: string]: string}; }[]
+	codes: DocumentData[]
 ) {
 	const batch = writeBatch(db);
 	const collectionRef: CollectionReference<DocumentData> = collection(db, collectionName);

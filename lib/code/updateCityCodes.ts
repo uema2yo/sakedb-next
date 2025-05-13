@@ -1,4 +1,5 @@
 import { updateCodes } from "@/lib/code/updateCodes";
+import { DocumentData } from "firebase/firestore";
 
 const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
 
@@ -10,7 +11,6 @@ if (process.env.NEXT_PUBLIC_RESAS_API_KEY) {
 
 async function getCityApi(prefCode: number) {
 	if (prefCode > 0) {
-		console.log(prefCode)
 		const cityApi = await fetch(`${baseUrl}/api/city?prefCode=${prefCode}`);
 		return await cityApi.json();
 	} else {
@@ -33,17 +33,20 @@ export async function updateCityCodes() {
 */
 		prefectures.forEach(async (prefecture: { code: number; name: string }) => {
       const cities = await getCityApi(prefecture.code);
+      /*
       let cityCodes: {
         code: string | number;
         label: string;
         prefCode: number;
-      }[] = [];
+      }[] = []; */
+      let cityCodes: DocumentData[] = [];
       cities.forEach(
-        (r: { code: number; name: string; prefecture_code: number }) => {
+        //(r: { code: number; name: string; prefecture_code: number }) => {
+        (r: DocumentData) => {
           cityCodes.push({
             code: r.code,
-            label: r.name,
-            prefCode: r.prefecture_code,
+            label: {ja: r.name},
+            prefecture: r.prefecture_code,
           });
         }
       );

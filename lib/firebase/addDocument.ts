@@ -8,7 +8,6 @@ export async function addDocument(
   try {
 		await checkLogin();
 		const uid = loginInfo.uid;
-console.log("logininfo",loginInfo);
     if (!uid) {
       throw new Error("Not logged in");
     }

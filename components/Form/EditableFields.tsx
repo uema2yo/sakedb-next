@@ -1,16 +1,15 @@
 "use strict";
+import { getDocuments } from "@/lib/firebase/getDocuments";
 import React, { useState, useEffect, useRef } from "react";
 
 interface Props {
   field: {
     id: string;
-    //collectionName: string;
     fields: (
       | {
           name: string;
           type: string;
           checked: boolean;
-
           disabled: boolean;
         }
       | {
@@ -20,6 +19,7 @@ interface Props {
         }
     )[];
   };
+
   isPublic: boolean;
   userLoggedIn: boolean;
   validate?: (
@@ -30,13 +30,20 @@ interface Props {
     result: boolean;
     message?: string | undefined;
   }>;
+  defaultEditMode?: boolean; 
+  change?: Function;
+  editing?: Function;
   save: Function;
-  //startEditing: Function;
+  default?: string;
   children?: React.ReactNode;
 }
 
 const EditableFields = (props: Props) => {
   const { field, isPublic, userLoggedIn, save } = props;
+
+  const targetField = field.fields.find((f) => f.name === "value");
+  const targetValue = targetField && "value" in targetField ? targetField.value : undefined;
+
   const [isEditing, setIsEditing] = useState(false);
   const [editedFields, setEditedFields] = useState(() =>
     JSON.parse(JSON.stringify(field.fields))
@@ -45,10 +52,16 @@ const EditableFields = (props: Props) => {
   const [errorMessage, setErrorMessage] = useState<string | null | undefined>(
     ""
   );
+  const [options, setOptiopns] = useState([]);
+  const [loading, setLoading] = useState(false);
+
   const inputElements = useRef(new Array(field.fields.length));
   const selectElements = useRef(new Array(field.fields.length));
+
   const startEditing = () => {
-    //props.startEditing();
+    setSubmitDisabled(!props.defaultEditMode);
+    console.log("startEditing")
+    props.editing && props.editing();
     setIsEditing(true);
     setEditedFields(JSON.parse(JSON.stringify(field.fields)));
     console.log("editedFields",editedFields)
@@ -58,10 +71,8 @@ const EditableFields = (props: Props) => {
     i: number,
     event: React.ChangeEvent<HTMLSelectElement>
   ) => {
-    //const prevFields = field.fields;
     const newFields = [...editedFields];
     const value = event.target.value;
-
     newFields[i] = {
       ...newFields[i],
       value: value,
@@ -90,28 +101,30 @@ const EditableFields = (props: Props) => {
     i: number,
     event: React.ChangeEvent<HTMLInputElement>
   ) => {
-    const prevFields = field.fields;
     const newFields = [...editedFields];
     const value = event.target.value;
-    const validate = (saveOnly: boolean) => {
-      if (prevFields !== newFields) {
+    const validateResult = () => {
+      console.log(targetValue, value);
+      if (targetValue !== value) {
         return (
-          props.validate && props.validate(props.field.id, value, saveOnly)
+          props.validate && props.validate(props.field.id, value, false)
         );
+      } else {
+        return { result: false, message: "" };
       }
     };
-    const validateResult = validate(false);
-
+    
     newFields[i] = {
       ...newFields[i],
       value: value,
     };
 
     setEditedFields(newFields);
+    console.log("validateResult", validateResult)
 
-    if (validateResult && (await validateResult).result === false) {
-      setErrorMessage((await validateResult)?.message);
-      setSubmitDisabled(false);
+    if ((await validateResult())?.result === false) {
+      setErrorMessage((await validateResult())?.message);
+      setSubmitDisabled(true);
     } else {
       setErrorMessage("");
       setSubmitDisabled(false);
@@ -119,6 +132,7 @@ const EditableFields = (props: Props) => {
   };
 
   const handleSave = async (event: React.FormEvent<HTMLFormElement>) => {
+    setLoading(true);
     const form = event.target as HTMLFormElement;
     const save = await props.save(form);
     if (save.result) {
@@ -126,6 +140,7 @@ const EditableFields = (props: Props) => {
     } else {
       setErrorMessage(save.message);
     }
+    setLoading(false);
   };
 
   const cancelEdit = () => {
@@ -133,8 +148,8 @@ const EditableFields = (props: Props) => {
   };
 
   useEffect(() => {
-    const value = field.fields.find((field) => field.name === "value")?.value;
-    if (value === "") {
+    console.log("props?.defaultEditMode",props.field, props?.defaultEditMode)
+    if (targetValue === "" || props?.defaultEditMode) {
       startEditing();
     } else {
       cancelEdit();
@@ -149,7 +164,9 @@ const EditableFields = (props: Props) => {
 
   return (
     <>
-      {isEditing && props.userLoggedIn ? (
+      {loading ? 
+      (<span>Loading...</span>) :
+      isEditing && props.userLoggedIn ? (
         <form
           onSubmit={(event) => {
             event.preventDefault();
@@ -193,6 +210,11 @@ const EditableFields = (props: Props) => {
                       value={fieldData.value as number}
                       onChange={e => handleChangeSelect(i as number, e)}
                     >
+                      {props.default && 
+                        <option key={0} value={props.default}>
+                          -----
+                        </option>
+                      }
                       {fieldData.options.map(
                         (
                           option: {
@@ -322,9 +344,11 @@ const EditableFields = (props: Props) => {
           <button type="submit" disabled={submitDisabled}>
             Save
           </button>
-          <button type="button" onClick={cancelEdit}>
-            Cancel
-          </button>
+          {!props.defaultEditMode &&
+            <button type="button" onClick={cancelEdit}>
+              Cancel
+            </button>
+          }
         </form>
       ) : userLoggedIn ? (
         // Button to start editing

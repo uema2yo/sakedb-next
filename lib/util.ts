@@ -1,3 +1,5 @@
+import { DocumentData } from "firebase/firestore";
+
 export function generateUniqueToken(length: number = 32): string {
   const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_';
   let token = "";
@@ -9,13 +11,12 @@ export function generateUniqueToken(length: number = 32): string {
 }
 
 export function getLabelFromCode<T extends { code: string | number; label: Record<string, string> }>(
-  codes: readonly T[],
+  codes: DocumentData[],
   code: string | number,
   lang?: string
 ): string | undefined {
   const result = codes.find(item => item.code === code);
-  console.log("code",result);
-  return result ? result.label[lang || "ja"] : undefined; 
+  return result ? result.label[lang || "ja"] : "-----"; 
 }
 
 

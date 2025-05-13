@@ -2,22 +2,27 @@ import { updateCodes } from "@/lib/code/updateCodes";
 
 const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
 
+interface Label {
+  [key: string]: string
+}
+
+interface CountryCode {
+  code: string | number;
+  label: Label;
+  subregion: string;
+}
+
 export async function updateCountryCodes() {
-  const countryCodes: {
-    code: string | number;
-    label: string;
-    subregion: string;
-  }[] = [];
+  const countryCodes: CountryCode[] = [];
 
   try {
     const country = await fetch(`${baseUrl}/api/country`);
     const countries = await country.json();
-
-    countries.forEach((r: { code: number; name: string; subregion_code: string }) => {
+    countries.forEach((r: { code: string; label: Label; subregion: string }) => {
       countryCodes.push({
         code: r.code,
-        label: r.name,
-        subregion: r.subregion_code
+        label: r.label,
+        subregion: r.subregion
       });
     });
 

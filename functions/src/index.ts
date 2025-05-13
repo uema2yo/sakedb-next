@@ -6,6 +6,9 @@ import next from "next";
 import express from "express";
 import cors from "cors";
 import { getCountryData } from "./api/country";
+import path from "path";
+import fs from "fs/promises";
+
 
 const dev = process.env.NODE_ENV !== "production";
 const nextApp = next({ dev });
@@ -18,6 +21,20 @@ const initPromise = (async () => {
   const app = express();
 
   app.use(cors({ origin: true }));
+
+  app.get("/api/subregion", async (req, res) => {
+    try {
+      const subregionPath = path.resolve(__dirname, "./public/subregions.json");
+      const response: { code: string; label: Record<string, string> }[] = JSON.parse(
+        await fs.readFile(subregionPath, "utf8")
+      );
+      return res.json(response);
+
+    } catch (error: any) {
+      return res
+        .status(500)
+    }
+  });
 
   app.get("/api/country", getCountryData);
 
@@ -53,11 +70,11 @@ const initPromise = (async () => {
 
   app.get("/api/city", async (req, res) => {
     const prefCode = req.query.prefCode as string;
-  
+
     if (!prefCode) {
       return res.status(400).json({ error: "prefCode is required" });
     }
-  
+
     try {
       const response = await axios.post(
         endPoint,
@@ -71,7 +88,7 @@ const initPromise = (async () => {
               }
             }
           `,
-          variables: { prefCodes: [String(prefCode)] }
+          variables: { prefCodes: [String(prefCode)] },
         },
         {
           headers: {
@@ -86,13 +103,14 @@ const initPromise = (async () => {
         data: error.response?.data,
         status: error.response?.status,
         headers: error.response?.headers,
-      });      
-      return res.status(500).json({ error: "Failed to fetch municipalities data from MLIT." });
+      });
+      return res
+        .status(500)
+        .json({ error: "Failed to fetch municipalities data from MLIT." });
     }
   });
 
   app.all(/^.*$/, (req, res) => {
-
     console.log("🔁 Fallback route hit:", req.method, req.url);
     return handle(req, res);
   });

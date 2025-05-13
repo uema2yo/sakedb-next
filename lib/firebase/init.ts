@@ -1,7 +1,8 @@
 import { initializeApp, getApps, getApp } from "firebase/app";
 //import type { Firestore } from "firebase-admin/firestore";
-import type { Firestore } from "firebase/firestore";
 import type { FirebaseApp } from "firebase/app";
+import type { Firestore } from "firebase/firestore";
+import type { FirebaseStorage } from "firebase/storage";
 import type { Auth } from "firebase/auth";
 import {
   getAuth,
@@ -10,6 +11,7 @@ import {
   connectAuthEmulator,
 } from "firebase/auth";
 import { getFirestore, connectFirestoreEmulator } from "firebase/firestore";
+import { getStorage, connectStorageEmulator } from "firebase/storage";
 
 interface FirebaseConfig {
   apiKey?: string;
@@ -36,14 +38,17 @@ const firebaseConfig: FirebaseConfig = {
     process.env.NEXT_PUBLIC_LOCAL === "TRUE" ? "localhost:9099" : "",
 };
 
-let app: FirebaseApp, db: Firestore, auth: Auth;
+let app: FirebaseApp, db: Firestore, storage: FirebaseStorage, auth: Auth;
 
 if (!globalThis.firebaseApp) {
 	app = getApps().length ? getApp() : initializeApp(firebaseConfig);
 	db = getFirestore(app);
+	storage = getStorage(app);
 	auth = getAuth(app);
+	setPersistence(auth, browserLocalPersistence);
 	if (process.env.NEXT_PUBLIC_LOCAL === "TRUE") {
     connectFirestoreEmulator(db, "127.0.0.1", 8080);
+		connectStorageEmulator(storage, "localhost", 9199);
     connectAuthEmulator(auth, "http://localhost:9099");
 	}
 	globalThis.firebaseApp = app;
