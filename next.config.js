@@ -1,2 +1,6 @@
 /** @type {import('next').NextConfig} */
-export const target = process.env.NODE_ENV === 'production' ? 'serverless' : 'server';
+const nextConfig = {
+  // ここに他の設定を記述（例: reactStrictMode: true など）
+};
+
+export default nextConfig;

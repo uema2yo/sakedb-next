@@ -1,22 +1,13 @@
 "use client";
 
-import React, { useState, useEffect, MouseEventHandler } from "react";
-import { useRouter } from "next/router";
-import { auth, db } from "@/lib/firebase/init";
-import { addDocument } from "@/lib/firebase/addDocument";
+import React, { useState, MouseEventHandler } from "react";
 import { getDocuments } from "@/lib/firebase/getDocuments";
 import { updateRegionCodes } from "@/lib/code/updateRegionCodes";
 import { updateCountryCodes } from "@/lib/code/updateCountryCodes";
 import { updatePrefectureCodes } from "@/lib/code/updatePrefectureCodes";
 import { updateCityCodes } from "@/lib/code/updateCityCodes";
-import type { LoginInfoProps } from "@/lib/checkLogin";
-
-import Layout from "@/layout";
-
-interface Props {
-  loginInfo: LoginInfoProps;
-  loginLoading: boolean;
-}
+import { useLoginContext } from "@/contexts/LoginContext";
+import Loading from "@/components/Loading";
 
 const apiImportHandler: MouseEventHandler<HTMLButtonElement> = async (e) => {
   const target = e.target as HTMLButtonElement;
@@ -43,25 +34,27 @@ const openEditorHandler: MouseEventHandler<HTMLButtonElement> = async (e) => {
   console.log(target);
 };
 
-const Admin = (props: Props) => {
+const Page = () => {
+  const { loginInfo, loginLoading } = useLoginContext();
   const [userId, setUserId] = useState("");
   const [userName, setUserName] = useState("");
   const [loading, setLoading] = useState(true);
-  const { loginInfo, loginLoading } = props;
-  const { uid, admin } = loginInfo;
+
+  if (loginLoading) return <Loading />;
+
   (async () => {
     try {
       const documents = await getDocuments([
         {
           collectionName: "b_user_id",
-          conditions: [{ name: "uid", operator: "==", value: uid }],
+          conditions: [{ name: "uid", operator: "==", value: loginInfo?.uid || "" }],
           public_only: false,
           order_by: { field: "timestamp", direction: "desc" },
           limit_num: 1,
         },
         {
           collectionName: "b_user_name",
-          conditions: [{ name: "uid", operator: "==", value: uid }],
+          conditions: [{ name: "uid", operator: "==", value: loginInfo?.uid || "" }],
           public_only: false,
           order_by: { field: "timestamp", direction: "desc" },
           limit_num: 1,
@@ -76,11 +69,10 @@ const Admin = (props: Props) => {
   })();
 
   return (
-    <Layout loginInfo={loginInfo} loginLoading={loginLoading}>
       <main>
         <header>
           <h1>管理画面</h1>
-          {admin ? (
+          {loginInfo?.admin ? (
             <>
               <p>
                 管理者 {userName}（ID: {userId}） でログイン中
@@ -93,7 +85,7 @@ const Admin = (props: Props) => {
           )}
         </header>
 
-        {admin && (
+        {loginInfo?.admin && (
           <>
             <article>
               <h2>地域コード</h2>
@@ -170,8 +162,7 @@ const Admin = (props: Props) => {
           </>
         )}
       </main>
-    </Layout>
   );
 };
 
-export default Admin;
+export default Page;

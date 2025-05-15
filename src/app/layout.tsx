@@ -1,16 +1,32 @@
-"use client";
-
-import { ReactNode, useState } from "react";
-import type { Metadata } from "next";
+import { ReactNode } from "react";
 import { Inter } from "next/font/google";
-import { useRef } from "react";
 import "./globals.css";
-import Header from "@/components/Header";
-import Footer from "@/components/Footer";
-import Dialog, { DialogComponentHandle } from "@/components/Dialog";
+import { Providers } from "@/lib/Providers";
+import ClientLayoutInner from "@/components/ClientLayoutInner";
+import { LoginProvider } from "@/contexts/LoginContext";
 
 const inter = Inter({ subsets: ["latin"] });
 
+export const metadata = {
+  title: "My App",
+  description: "App Router Layout",
+};
+
+export default function RootLayout({ children }: { children: ReactNode }) {
+  return (
+    <html lang="ja">
+      <body className={inter.className}>
+        <Providers>
+          <LoginProvider>
+          <ClientLayoutInner>{children}</ClientLayoutInner>
+          </LoginProvider>
+        </Providers>
+      </body>
+    </html>
+  );
+}
+
+/*
 export default function RootLayout(
   { children }: { children: ReactNode },
   loginInfo: {
@@ -39,15 +55,20 @@ export default function RootLayout(
   return (
     <html lang="en">
       <body className={inter.className}>
+    <DialogProvider
+      value={{ onDialogToggleButtonClick: handleDialogToggleButtonClick }}
+    >
+
         <Header
           onDialogToggleButtonClick={handleDialogToggleButtonClick}
           loginInfo={loginInfo}
           loginLoading={loginLoading}
-        />
+        />!!!!!
         {children}
         <Footer />
         <Dialog ref={dialogRef} id={id} title={title} slot={slot} />
+        </DialogProvider>
       </body>
     </html>
   );
-}
+}*/

@@ -1,23 +1,18 @@
 "use client";
 
-import React, { useState, useEffect, ReactNode } from "react";
+import React, { useState, useEffect } from "react";
 import { useRouter } from "next/router";
-import { auth, db } from "@/lib/firebase/init";
+import { auth } from "@/lib/firebase/init";
 import { addDocument } from "@/lib/firebase/addDocument";
-import { setDoc, doc } from "firebase/firestore";
 import { User, createUserWithEmailAndPassword } from "firebase/auth";
 import { validateForms } from "@/lib/code/validateForms";
-import Layout from "@/layout";
-import type { LoginInfoProps } from "@/lib/checkLogin";
 import SignupButton from "@/components/SignupButton";
 import { createUser } from "@/lib/firebase/createUser";
+import { useLoginContext } from "@/contexts/LoginContext";
+import Loading from "@/components/Loading";
 
-interface Props {
-  loginInfo: LoginInfoProps;
-  loginLoading: boolean;
-}
-
-const Signup = (props: Props) => {
+const Page = () => {
+  const { loginLoading } = useLoginContext();
   const [userId, setUserId] = useState("");
   const [password, setPassword] = useState("");
   const [email, setEmail] = useState("");
@@ -29,7 +24,8 @@ const Signup = (props: Props) => {
   const [submitDisabled,setSubmitDisabled] = useState(true);
 
   const router = useRouter();
-  const { loginInfo, loginLoading } = props;
+  
+  if (loginLoading) return <Loading />;
 
   useEffect(() => {
     setEmail(window.localStorage.getItem("emailForSignup") || "");
@@ -105,8 +101,7 @@ const Signup = (props: Props) => {
   }, [userId, password, confirmPassword, validateUserId, validatePassword]);
 
   return (
-    <Layout loginInfo={loginInfo} loginLoading={loginLoading} >
-      <div >
+      <main>
         <p>
           ユーザー ID とパスワードを設定してください。（※ ユーザー ID
           は、ウェブ上で一般公開されます。）
@@ -151,10 +146,9 @@ const Signup = (props: Props) => {
         <>
         {validateEmailExists.message !== "" && <p>{validateEmailExists.message}</p>}
         <SignupButton />
-        </>}        
-      </div>
-    </Layout>
+        </>}
+        </main>
   );
 };
 
-export default Signup;
+export default Page;

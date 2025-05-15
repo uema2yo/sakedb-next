@@ -35,7 +35,7 @@ const firebaseConfig: FirebaseConfig = {
   appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
   measurementId: process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID,
   authEmulatorHost:
-    process.env.NEXT_PUBLIC_LOCAL === "TRUE" ? "localhost:9099" : "",
+  process.env.NEXT_PUBLIC_LOCAL === "TRUE" ? "localhost:9099" : "",
 };
 
 let app: FirebaseApp, db: Firestore, storage: FirebaseStorage, auth: Auth;
@@ -74,4 +74,4 @@ if (process.env.NEXT_PUBLIC_LOCAL === "TRUE") {
   connectAuthEmulator(auth, "http://localhost:9099");
 }*/
 
-export { app, db, auth };
+export { app, db, auth, storage };

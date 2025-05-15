@@ -1,14 +1,19 @@
+"use client";
+
 import { useState, useEffect } from "react";
+import { useSelector, useDispatch } from "react-redux";
+import type { RootState, AppDispatch } from "@/lib/store"
+//import { setProfileImageUrl,clearProfileImageUrl } from "@/features/profileImage/profileImageSlice";  
 import { addDocument } from "@/lib/firebase/addDocument";
 import { getDocuments } from "@/lib/firebase/getDocuments";
-import type { GetCollectionConfig } from "@/types/getDocumentsConfig";
 import Loading from "@/components/Loading";
+import ImageUploader from "@/components/Form/ImageUploader";
 import EditableFields from "@/components/Form/EditableFields";
 import { validateForms } from "@/lib/code/validateForms";
 import { formatDate, generateUniqueToken, getLabelFromCode, loadArrayFromJSON } from "@/lib/util";
 import { GENDER_CODES } from "@/constants";
-import { sign } from "crypto";
-import { DocumentData } from "firebase/firestore";
+import type { GetCollectionConfig } from "@/types/getDocumentsConfig";
+import type { DocumentData } from "firebase/firestore";
 
 interface Props {
   uid: string;
@@ -102,7 +107,7 @@ const ProfileModule = (props: Props) => {
   const [prefectures, setPrefectures] = useState<DocumentData[]>();
   const [cities, setCities] = useState<DocumentData[]>();
   const [document, setDocument] = useState<Record<string, { public: boolean; value: string | number | boolean }>>({
-/*    id: {
+    /*    id: {
       public: true,
       value: altUserId
     },
@@ -135,7 +140,9 @@ const ProfileModule = (props: Props) => {
       value: "00"
     }*/
   });
+  const [profileImageUrl, setProfileImageUrl] = useState("");
 
+  //const profileImageUrl = useSelector((state: RootState) => state.profileImage.url);
   const field = {
     id: {
       id: "id",
@@ -488,12 +495,20 @@ const ProfileModule = (props: Props) => {
       ) : (
         <article>
           <h2>
+          </h2>
+          <figure>
+            <figcaption>
             {(document.id?.value && document.name?.value) && 
               <>
               {document.name?.value}（{document.id?.value}）さんのプロフィール
               </>
             }
-          </h2>
+            </figcaption>
+            {props.uid ?
+              <ImageUploader onUploadComplete={setProfileImageUrl} />:
+              <img src={profileImageUrl} />
+            }
+          </figure>
           <section>
             <h3>ユーザーID</h3>
             {
@@ -524,6 +539,7 @@ const ProfileModule = (props: Props) => {
               {userProfileItem.name.value}
             </EditableFields> }
           </section>
+
           <section>
             <h3>性別</h3>
             {

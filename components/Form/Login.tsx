@@ -1,6 +1,6 @@
 "use client";
 import { useState, useEffect, FormEvent } from "react";
-import { useRouter } from "next/router";
+import { useRouter } from "next/navigation";
 import { auth } from "@/lib/firebase/init";
 import {
   onAuthStateChanged,
@@ -17,7 +17,7 @@ const Login = () => {
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (user) {
-        router.reload();
+        router.refresh();
       }
     });
     return () => unsubscribe();

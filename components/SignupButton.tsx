@@ -2,7 +2,7 @@
 
 import React from "react";
 import EmailForSignup from "@/components/Form/EmailForSignup";
-import { useDialog } from "@/contexts/dialogContext";
+import { useDialog } from "@/contexts/DialogContext";
 
 interface Props {
 }

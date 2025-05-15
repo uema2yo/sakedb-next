@@ -32,6 +32,9 @@
       "@/lib/*": [
         "./lib/*"
       ],
+      "@/features/*": [
+        "./features/*"
+      ],
       "@/components/*": [
         "./components/*"
       ],

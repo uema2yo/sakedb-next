@@ -1,4 +1,6 @@
-import { useRouter } from "next/router";
+"use client";
+
+import { useRouter } from "next/navigation";
 import { signOut } from "firebase/auth";
 import { auth } from "@/lib/firebase/init";
 
@@ -7,14 +9,7 @@ const Logout = () => {
   const logout = async () => {
     try {
       await signOut(auth);
-
-      /*
-      if (router.pathname === "/") {
-        router.reload();
-      } else {
-        router.push("/");
-      }*/
-     router.replace("/");
+      router.replace("/");
     } catch (error) {
       console.error("ログアウトに失敗しました。", error);
     }
