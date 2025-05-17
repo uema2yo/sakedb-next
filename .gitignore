@@ -13,8 +13,14 @@
 /.next/
 /out/
 
+
 # functions
 /functions/.next/
+/functions/firestore-data/export/
+/functions/firestore-data/firestore_export/
+/functions/firestore-data/*.tmp
+
+# frontend#/frontend/.next
 
 # production
 /build
