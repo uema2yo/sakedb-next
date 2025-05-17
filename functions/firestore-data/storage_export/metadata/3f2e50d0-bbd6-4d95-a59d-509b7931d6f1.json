@@ -1,0 +1,19 @@
+{
+  "name": "images/IMG_1577.webp",
+  "bucket": "sake-db.appspot.com",
+  "metageneration": 1,
+  "generation": 1747509408832,
+  "contentType": "image/webp",
+  "storageClass": "STANDARD",
+  "contentDisposition": "inline",
+  "downloadTokens": [
+    "c8139a5a-8c1b-4e19-891c-2a8c79208b05"
+  ],
+  "etag": "r/a8X/ZK7zPT7+6BYXXWNeJ44Z8",
+  "customMetadata": {},
+  "timeCreated": "2025-05-17T19:16:48.832Z",
+  "updated": "2025-05-17T19:16:48.832Z",
+  "size": 181584,
+  "md5Hash": "llNV8I3nkqwjq+Myu00wBw==",
+  "crc32c": "442004741"
+}

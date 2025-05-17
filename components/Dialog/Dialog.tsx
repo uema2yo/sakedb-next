@@ -11,7 +11,7 @@ import React, {
 interface DialogProps {
   id?: string;
   title?: string;
-  slot?: ReactNode;
+  slot?: (closeDialog: () => void) => ReactNode;
 };
 
 export interface DialogComponentHandle {
@@ -22,27 +22,24 @@ export interface DialogComponentHandle {
 
 const Dialog = forwardRef<DialogComponentHandle, DialogProps>(({ id, title, slot }, ref) => {
   const [open, setOpen] = useState(false);
+  const openRef = useRef(null);
+
+  const toggleDialog = () => setOpen(!open);
+  const openDialog = () => setOpen(true);
+  const closeDialog = () => setOpen(false);
+
   useImperativeHandle(ref, () => ({
     toggleDialog,
     openDialog,
     closeDialog
   }));
-  const openRef = useRef(null);
-  const toggleDialog = () => {
-    setOpen(!open);
-  }
-  const openDialog = () => {
-    setOpen(true);
-  }
-  const closeDialog = () => {
-    setOpen(false);
-  }
+
   return (
-  <dialog id={id} ref={openRef} open={open}>
-    <button onClick={closeDialog}>&#10005;</button>
-    <h2>{title}</h2>
-    {slot}
-  </dialog>
+    <dialog id={id} ref={openRef} open={open}>
+      <button onClick={closeDialog}>&#10005;</button>
+      <h2>{title}</h2>
+      {slot && slot(closeDialog)}
+    </dialog>
   );
 });
 Dialog.displayName = "Dialog";

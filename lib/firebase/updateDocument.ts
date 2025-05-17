@@ -5,7 +5,8 @@ import { checkLogin, loginInfo } from "@/lib/checkLogin";
 export async function updateDocument(
   collectionName: string,
   documentId: string,
-  updateData: { status: string, updatedAt: Date }
+  //updateData: { status: string, updatedAt: Date }
+  updateData: { [key: string]: string | number |boolean }
 ) {
   await fetch("/api/updateDocument", {
     method: "POST",

@@ -9,7 +9,7 @@ type HeaderProps = {
   onDialogToggleButtonClick: (
     id: string,
     title: string,
-    slot: ReactNode
+    slot: (closeDialog: () => void) => React.ReactNode
   ) => void;
   loginInfo: {
     uid: string;
@@ -18,6 +18,7 @@ type HeaderProps = {
     status: number;
   } | null;
   loginLoading: boolean;
+  
 };
 
 const Header: FC<HeaderProps> = ({
@@ -25,6 +26,10 @@ const Header: FC<HeaderProps> = ({
   loginInfo,
   loginLoading,
 }) => {
+  function closeDialog(): void {
+    throw new Error("Function not implemented.");
+  }
+
   return (
     <header>
       <h1>{SITE_TITLE}</h1>
@@ -33,7 +38,9 @@ const Header: FC<HeaderProps> = ({
       ) : loginInfo?.uid ? (
         <button
           onClick={() =>
-            onDialogToggleButtonClick("logout", "ログアウト", <Logout />)
+            onDialogToggleButtonClick("logout", "ログアウト確認", (closeDialog) => (
+              <Logout closeDialog={closeDialog} />
+            ))
           }
         >
           ログアウト
@@ -42,7 +49,9 @@ const Header: FC<HeaderProps> = ({
         <>
           <button
             onClick={() =>
-              onDialogToggleButtonClick("login", "ログイン", <Login />)
+              onDialogToggleButtonClick("login", "ログイン", (closeDialog) => (
+                <Logout closeDialog={closeDialog} />
+              ))
             }
           >
             ログイン

@@ -1,7 +1,12 @@
 import { createContext, useContext, ReactNode } from "react";
 
-interface DialogContextProps {
-  onDialogToggleButtonClick: (id: string, title: string, slot: ReactNode) => void;
+export interface DialogContextProps {
+  onDialogToggleButtonClick: (
+    id: string,
+    title: string,
+    slot: (closeDialog: () => void) => ReactNode
+  ) => void;
+  closeDialog: () => void;
 }
 
 const DialogContext = createContext<DialogContextProps | undefined>(undefined);

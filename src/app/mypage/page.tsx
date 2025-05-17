@@ -5,8 +5,8 @@ import { useLoginContext } from "@/contexts/LoginContext";
 import ProfileModule from "@/modules/ProfileModule";
 
 const Page = () => {
-  const { loginInfo, loginLoading } = useLoginContext();
-
+  const { loginLoading } = useLoginContext();
+  
   if (loginLoading) return <Loading />;
 
   return(
@@ -14,7 +14,7 @@ const Page = () => {
         <header>
             <h1>マイページ</h1>
         </header>
-        <ProfileModule uid={loginInfo?.uid || ""} />
+        <ProfileModule />
       </main>
   );
 }

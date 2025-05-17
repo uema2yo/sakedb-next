@@ -1,50 +1,48 @@
 "use client";
 
-import { ReactNode, useState, useRef } from "react";
+import { ReactNode, useRef, useState } from "react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
-import Dialog, { DialogComponentHandle } from "@/components/Dialog";
+import Dialog, { DialogComponentHandle } from "@/components/Dialog/Dialog";
 import { DialogProvider } from "@/contexts/DialogContext";
 import { useLoginContext } from "@/contexts/LoginContext";
-//import { checkLogin, loginInfo } from "@/lib/checkLogin";
 
 export default function ClientLayoutInner(
-  { children }: { children: ReactNode }) {
+  { children }: { children: ReactNode }
+) {
   const { loginInfo, loginLoading } = useLoginContext();
-  const uid = loginInfo ? loginInfo.uid : "";
-  
+  const dialogRef = useRef<DialogComponentHandle>(null);
   const [id, setId] = useState("");
   const [title, setTitle] = useState("");
-  const [slot, setSlot] = useState<ReactNode>();
-  const dialogRef = useRef<DialogComponentHandle>(null);
-  //const [loginLoading, setLoginLoading] = useState(true);
-  const handleDialogToggleButtonClick = (
+  const [slot, setSlot] = useState<(closeDialog: () => void) => ReactNode>();
+
+  const onDialogToggleButtonClick = (
     id: string,
     title: string,
-    slot: ReactNode
+    slot: (closeDialog: () => void) => ReactNode
   ) => {
     setId(id);
     setTitle(title);
-    setSlot(slot);
+    setSlot(() => slot); // 必ず関数として渡す
     dialogRef.current?.openDialog();
   };
 
-  //const { loginInfo, loginLoading } = useLoginContext();
-console.log("LayoutInner")
-  //if (loginLoading) return <p>ログイン確認中...</p>;
-
-  //await checkLogin();
-
-  //setLoginLoading(false);
+  const closeDialog = () => {
+    dialogRef.current?.closeDialog();
+  };
 
   return (
     <DialogProvider
-      value={{ onDialogToggleButtonClick: handleDialogToggleButtonClick }}
+      value={{ onDialogToggleButtonClick, closeDialog }}
     >
-      <Header loginInfo={loginInfo} loginLoading={loginLoading} onDialogToggleButtonClick={handleDialogToggleButtonClick} />
+      <Header
+        loginInfo={loginInfo}
+        loginLoading={loginLoading}
+        onDialogToggleButtonClick={onDialogToggleButtonClick}
+      />
       {children}
       <Footer />
-      <Dialog ref={dialogRef} id={id} title={title} slot={slot} />
+      <Dialog id={id} title={title} slot={slot} ref={dialogRef} />
     </DialogProvider>
   );
 }

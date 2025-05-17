@@ -2,6 +2,9 @@
   "buckets": [
     {
       "id": "sake-db.firebasestorage.app"
+    },
+    {
+      "id": "sake-db.appspot.com"
     }
   ]
 }

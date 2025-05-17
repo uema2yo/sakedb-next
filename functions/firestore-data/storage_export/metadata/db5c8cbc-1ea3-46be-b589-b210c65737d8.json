@@ -1,0 +1,19 @@
+{
+  "name": "images/IMG_0488.webp",
+  "bucket": "sake-db.appspot.com",
+  "metageneration": 1,
+  "generation": 1747509373037,
+  "contentType": "image/webp",
+  "storageClass": "STANDARD",
+  "contentDisposition": "inline",
+  "downloadTokens": [
+    "9d4ecf80-f292-470f-9919-fb2d2ae44cc4"
+  ],
+  "etag": "mKqoeS3w8HIqV574LCA0i+uC2B8",
+  "customMetadata": {},
+  "timeCreated": "2025-05-17T19:16:13.037Z",
+  "updated": "2025-05-17T19:16:13.037Z",
+  "size": 168872,
+  "md5Hash": "pyugyKCodZNx4+fpOtGkFA==",
+  "crc32c": "64525142"
+}
