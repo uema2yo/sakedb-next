@@ -1,5 +1,6 @@
 "use strict";
-import { getDocuments } from "@/lib/firebase/getDocuments";
+
+import { countChars } from "@/lib/util";
 import React, { useState, useEffect, useRef } from "react";
 
 interface Props {
@@ -16,6 +17,7 @@ interface Props {
           name: string;
           type: string;
           value: string | number | boolean;
+          limit?: number;
         }
     )[];
   };
@@ -30,7 +32,7 @@ interface Props {
     result: boolean;
     message?: string | undefined;
   }>;
-  defaultEditMode?: boolean; 
+  defaultEditMode?: boolean;
   change?: Function;
   editing?: Function;
   save: Function;
@@ -42,7 +44,10 @@ const EditableFields = (props: Props) => {
   const { field, isPublic, userLoggedIn, save } = props;
 
   const targetField = field.fields.find((f) => f.name === "value");
-  const targetValue = targetField && "value" in targetField ? targetField.value : undefined;
+  const targetValue =
+    targetField && "value" in targetField ? targetField.value : undefined;
+  const limit = targetField && "value" in targetField ? `${targetField.limit} 文字` : "";
+  console.log("targetValue", targetValue);
 
   const [isEditing, setIsEditing] = useState(false);
   const [editedFields, setEditedFields] = useState(() =>
@@ -52,7 +57,7 @@ const EditableFields = (props: Props) => {
   const [errorMessage, setErrorMessage] = useState<string | null | undefined>(
     ""
   );
-  const [options, setOptiopns] = useState([]);
+  const [textareaCounter, setTextareaCounter] = useState(0);
   const [loading, setLoading] = useState(false);
 
   const inputElements = useRef(new Array(field.fields.length));
@@ -60,11 +65,11 @@ const EditableFields = (props: Props) => {
 
   const startEditing = () => {
     setSubmitDisabled(!props.defaultEditMode);
-    console.log("startEditing")
+    console.log("startEditing");
     props.editing && props.editing();
     setIsEditing(true);
     setEditedFields(JSON.parse(JSON.stringify(field.fields)));
-    console.log("editedFields",editedFields)
+    console.log("editedFields", editedFields);
   };
 
   const handleChangeSelect = async (
@@ -83,7 +88,7 @@ const EditableFields = (props: Props) => {
 
   const handleChangeCheckbox = async (
     i: number,
-    event: React.ChangeEvent<HTMLInputElement>    
+    event: React.ChangeEvent<HTMLInputElement>
   ) => {
     const newFields = [...editedFields];
     const checked = event.target.checked;
@@ -104,23 +109,19 @@ const EditableFields = (props: Props) => {
     const newFields = [...editedFields];
     const value = event.target.value;
     const validateResult = () => {
-      console.log(targetValue, value);
       if (targetValue !== value) {
-        return (
-          props.validate && props.validate(props.field.id, value, false)
-        );
+        return props.validate && props.validate(props.field.id, value, false);
       } else {
         return { result: false, message: "" };
       }
     };
-    
+
     newFields[i] = {
       ...newFields[i],
       value: value,
     };
 
     setEditedFields(newFields);
-    console.log("validateResult", validateResult)
 
     if ((await validateResult())?.result === false) {
       setErrorMessage((await validateResult())?.message);
@@ -129,6 +130,39 @@ const EditableFields = (props: Props) => {
       setErrorMessage("");
       setSubmitDisabled(false);
     }
+  };
+
+  const handleChangeTextarea = async (
+    i: number,
+    event: React.ChangeEvent<HTMLTextAreaElement>
+  ) => {
+    const newFields = [...editedFields];
+    const value = event.target.value;
+    const validateResult = () => {
+      if (targetValue !== value) {
+        return props.validate && props.validate(props.field.id, value, false);
+      } else {
+        return { result: false, message: "" };
+      }
+    };
+
+    setTextareaCounter(countChars(value));
+
+    newFields[i] = {
+      ...newFields[i],
+      value: value,
+    };
+
+    setEditedFields(newFields);
+
+    if ((await validateResult())?.result === false) {
+      setErrorMessage((await validateResult())?.message);
+      setSubmitDisabled(true);
+    } else {
+      setErrorMessage("");
+      setSubmitDisabled(false);
+    }
+
   };
 
   const handleSave = async (event: React.FormEvent<HTMLFormElement>) => {
@@ -148,8 +182,7 @@ const EditableFields = (props: Props) => {
   };
 
   useEffect(() => {
-    console.log("props?.defaultEditMode",props.field, props?.defaultEditMode)
-    if (targetValue === "" || props?.defaultEditMode) {
+    if (targetValue && (targetValue === "" || props?.defaultEditMode)) {
       startEditing();
     } else {
       cancelEdit();
@@ -159,14 +192,15 @@ const EditableFields = (props: Props) => {
   useEffect(() => {
     if (isEditing) {
       setEditedFields(JSON.parse(JSON.stringify(field.fields)));
+      setTextareaCounter(countChars(targetValue as string));
     }
   }, [isEditing, field.fields]);
 
   return (
     <>
-      {loading ? 
-      (<span>Loading...</span>) :
-      isEditing && props.userLoggedIn ? (
+      {loading ? (
+        <span>Loading...</span>
+      ) : isEditing && props.userLoggedIn ? (
         <form
           onSubmit={(event) => {
             event.preventDefault();
@@ -208,17 +242,21 @@ const EditableFields = (props: Props) => {
                       id={`editable-select-${field.id}-${fieldData.name}`}
                       ref={(el) => (selectElements.current[i as number] = el)}
                       value={fieldData.value as number}
-                      onChange={e => handleChangeSelect(i as number, e)}
+                      onChange={(e) => handleChangeSelect(i as number, e)}
                     >
-                      {props.default && 
+                      {props.default && (
                         <option key={0} value={props.default}>
                           -----
                         </option>
-                      }
+                      )}
                       {fieldData.options.map(
                         (
                           option: {
-                            code: string | number | readonly string[] | undefined;
+                            code:
+                              | string
+                              | number
+                              | readonly string[]
+                              | undefined;
                             label: Record<string, string>;
                           },
                           j: React.Key | null | undefined
@@ -236,15 +274,18 @@ const EditableFields = (props: Props) => {
                   return (
                     <div key={i}>
                       {
-                      <input
-                        type="checkbox"
-                        name={`${field.id}-${fieldData.name}`}
-                        id={`editable-input-${field.id}-${fieldData.name}`}
-                        disabled={fieldData.disabled}
-                        ref={(el) => (inputElements.current[i as number] = el)}
-                        checked={fieldData.checked}
-                        onChange={e => handleChangeCheckbox(i as number, e)}
-                      />}
+                        <input
+                          type="checkbox"
+                          name={`${field.id}-${fieldData.name}`}
+                          id={`editable-input-${field.id}-${fieldData.name}`}
+                          disabled={fieldData.disabled}
+                          ref={(el) =>
+                            (inputElements.current[i as number] = el)
+                          }
+                          checked={fieldData.checked}
+                          onChange={(e) => handleChangeCheckbox(i as number, e)}
+                        />
+                      }
                       {fieldData.label && (
                         <label htmlFor={`editable-input-${field.id}`}>
                           {fieldData.label}
@@ -280,21 +321,7 @@ const EditableFields = (props: Props) => {
                           },
                           j: React.Key | null | undefined
                         ) => (
-                          <label key={j}>
-                            {/*
-                            <input
-                              type="radio"
-                              name={`editable-input-${i}`}
-                              id={`editable-input-${i}-${j}`}
-                              ref={(el) =>
-                                (inputElements.current[`${i}-${j}`] = el)
-                              }
-                              value={option.value}
-                              checked={fieldData.value === option.value}
-                              onChange={}
-                            />*/}
-                            {option.label}
-                          </label>
+                          <label key={j}>{option.label}</label>
                         )
                       )}
                     </div>
@@ -319,6 +346,26 @@ const EditableFields = (props: Props) => {
                     </div>
                   );
                   break;
+                case "textarea":
+                  return (
+                    <div key={i}>
+                      {
+                        <textarea
+                          name={`${field.id}-${fieldData.name}`}
+                          id={`editable-textarea-${field.id}-${fieldData.name}`}
+                          ref={(el) =>
+                            (inputElements.current[i as number] = el)
+                          }
+                          value={(fieldData.value as string) ?? ""}
+                          onChange={(e) => handleChangeTextarea(i as number, e)}
+                        />
+                      }
+                      {textareaCounter}/{limit}
+
+                      {errorMessage !== "" && <p>{errorMessage}</p>}
+                    </div>
+                  );
+                  break;
                 default:
                   return (
                     <div key={i}>
@@ -330,7 +377,7 @@ const EditableFields = (props: Props) => {
                           ref={(el) =>
                             (inputElements.current[i as number] = el)
                           }
-                          value={fieldData.value as string ?? ""}
+                          value={(fieldData.value as string) ?? ""}
                           onChange={(e) => handleChangeText(i as number, e)}
                         />
                       }
@@ -344,11 +391,11 @@ const EditableFields = (props: Props) => {
           <button type="submit" disabled={submitDisabled}>
             Save
           </button>
-          {!props.defaultEditMode &&
+          {!props.defaultEditMode && (
             <button type="button" onClick={cancelEdit}>
               Cancel
             </button>
-          }
+          )}
         </form>
       ) : userLoggedIn ? (
         // Button to start editing

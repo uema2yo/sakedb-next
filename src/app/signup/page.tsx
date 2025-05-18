@@ -57,7 +57,7 @@ const Page = () => {
   const handleChangeUserId = async(event: React.ChangeEvent<HTMLInputElement>) => {
     const newUserId = event.target.value;
     setUserId(newUserId);
-    const validate = await validateForms("id", newUserId, false, "signup");
+    const validate = await validateForms("id", newUserId, false);
     setValidateUserId(validate);
   }
 

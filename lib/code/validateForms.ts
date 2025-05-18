@@ -1,13 +1,14 @@
 import { getDocuments } from "@/lib/firebase/getDocuments";
 import type { GetCollectionConfig } from "@/types/getDocumentsConfig";
-import { isDateInputSupported } from "../util";
+import { countChars, isDateInputSupported } from "../util";
+import store from "@/lib/store";
 
 export const validateForms = async (
   id: string,
   value: string | number | boolean,
   saveOnly: boolean, // 保存時のみで onChange には反応しない
-  uid?: string | undefined
 ) => {
+  const uid = store.getState().auth.uid as string;
   const execute: {
     [key: string]: () => Promise<{
       result: boolean;
@@ -57,12 +58,12 @@ export const validateForms = async (
       const duplicateIdConfig: GetCollectionConfig = {
         collectionName: "b_user_id",
         conditions:
-          uid === "signup"
-            ? [{ name: "value", operator: "==", value: value }]
-            : [
+          uid !== ""
+            ? [
                 { name: "value", operator: "==", value: value },
                 { name: "uid", operator: "!=", value: uid },
-              ],
+              ]
+            : [{ name: "value", operator: "==", value: value }],
       };
       duplicateItems = (await getDocuments([duplicateIdConfig])) as Array<{
         public: boolean;
@@ -105,6 +106,18 @@ export const validateForms = async (
         };
       }
     },
+    introduction: async () => {
+      if (countChars(value as string) > 200) {
+          return {
+            result: false,
+            message: "紹介文は 200 文字以内にまとめてください。"
+          }
+      } else {
+        return {
+          result: true,
+        }
+      }
+    }
   };
   return await execute[id]();
 };

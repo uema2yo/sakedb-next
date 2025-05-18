@@ -19,8 +19,6 @@ export function getLabelFromCode<T extends { code: string | number; label: Recor
   return result ? result.label[lang || "ja"] : "-----"; 
 }
 
-
-
 export function formatDate(dateStr: string, lang: "ja" | "en"): string {
   const [year, month, day] = dateStr.split("-").map(Number);
   const date = new Date(year, month - 1, day);
@@ -59,3 +57,10 @@ export async function loadArrayFromJSON(url: string) {
   }
 }
 
+export function countChars(str: string): number {
+  let count = 0;
+  for (const char of str) {
+    count += char.match(/[ -~]/) ? 0.5 : 1; // 半角ASCIIは0.5、それ以外は1
+  }
+  return Math.ceil(count); // 小数点切り上げ
+};
