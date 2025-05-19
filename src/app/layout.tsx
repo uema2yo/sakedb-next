@@ -1,6 +1,6 @@
 import { ReactNode } from "react";
 import { Inter } from "next/font/google";
-import "./globals.css";
+import "@/styles/globals.css";
 import { Providers } from "@/lib/Providers";
 import ClientLayoutInner from "@/components/ClientLayoutInner";
 import { LoginProvider } from "@/contexts/LoginContext";
