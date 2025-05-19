@@ -22,6 +22,7 @@
         "name": "next"
       }
     ],
+    "baseUrl": ".",
     "paths": {
       "@/*": [
         "./src/*"
@@ -30,34 +31,31 @@
         "./src/app/*"
       ],
       "@/lib/*": [
-        "./lib/*"
+        "./src/lib/*"
       ],
       "@/features/*": [
-        "./features/*"
+        "./src/features/*"
       ],
       "@/components/*": [
-        "./components/*"
+        "./src/components/*"
       ],
       "@/contexts/*": [
-        "./contexts/*"
+        "./src/contexts/*"
       ],
       "@/modules/*": [
-        "./modules/*"
+        "./src/modules/*"
+      ],
+      "@/styles/*": [
+        "./src/styles/*"
+      ],
+      "@/types/*": [
+        "./src/types/*"
       ],
       "@/pages/*": [
         "./pages/*"
       ],
-      "@/styles/*": [
-        "./styles/*"
-      ],
-      "@/types/*": [
-        "./types/*"
-      ],
       "@/constants": [
-        "./constants"
-      ],
-      "@/layout": [
-        "./pages/layout"
+        "./src/constants"
       ],
     },
     "forceConsistentCasingInFileNames": true
@@ -66,7 +64,10 @@
     "next-env.d.ts",
     "**/*.ts",
     "**/*.tsx",
-    ".next/types/**/*.ts"
+    ".next/types/**/*.ts",
+    "lib/**/*",
+    "features/**/*",
+    "components/**/*"
   ],
   "exclude": [
     "node_modules"

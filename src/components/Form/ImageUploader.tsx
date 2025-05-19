@@ -93,7 +93,6 @@ export default function ImageUploader(props: Props) {
 
   return (
     <div>
-      <h1>画像アップローダー（WebP変換）</h1>
       <input type="file" accept="image/*" onChange={handleFileChange} ref={inputRef} />
       {preview ? (
         <div>
