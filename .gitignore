@@ -18,6 +18,7 @@
 /functions/.next/
 /functions/firestore-data/export/
 /functions/firestore-data/firestore_export/
+/functions/firestore-data/storage_export/
 /functions/firestore-data/*.tmp
 
 # frontend#/frontend/.next

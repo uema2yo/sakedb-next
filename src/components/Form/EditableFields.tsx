@@ -249,7 +249,7 @@ const EditableFields = (props: Props) => {
                           -----
                         </option>
                       )}
-                      {fieldData.options.map(
+                      {fieldData.options?.map(
                         (
                           option: {
                             code:

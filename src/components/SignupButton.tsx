@@ -10,7 +10,9 @@ interface Props {
 const SignupDialogButton = (props: Props) => {
   const { onDialogToggleButtonClick } = useDialog();
   const handleClick = () => {
-    onDialogToggleButtonClick("signup", "ユーザー登録", <EmailForSignup />);
+    onDialogToggleButtonClick("signup", "ユーザー登録", (closeDialog) => (
+      <EmailForSignup />
+    ));
   };
 
   return (

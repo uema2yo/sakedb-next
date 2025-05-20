@@ -50,7 +50,7 @@ const Header: FC<HeaderProps> = ({
           <button
             onClick={() =>
               onDialogToggleButtonClick("login", "ログイン", (closeDialog) => (
-                <Logout closeDialog={closeDialog} />
+                <Login />
               ))
             }
           >
