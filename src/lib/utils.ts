@@ -1,5 +1,9 @@
 import { DocumentData } from "firebase/firestore";
 
+// tailwindcss
+import { clsx, type ClassValue } from "clsx"
+import { twMerge } from "tailwind-merge"
+
 export function generateUniqueToken(length: number = 32): string {
   const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_';
   let token = "";
@@ -64,3 +68,9 @@ export function countChars(str: string): number {
   }
   return Math.ceil(count); // 小数点切り上げ
 };
+
+
+// tailwindcss
+export function cn(...inputs: ClassValue[]) {
+  return twMerge(clsx(inputs))
+}

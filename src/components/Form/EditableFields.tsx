@@ -1,6 +1,6 @@
 "use strict";
 
-import { countChars } from "@/lib/util";
+import { countChars } from "@/lib/utils";
 import React, { useState, useEffect, useRef } from "react";
 
 interface Props {

@@ -1,37 +1,22 @@
-import { useState, useEffect, ReactNode } from "react";
+import "@/styles/globals.css";
 import type { AppProps } from "next/app";
-import { NextPage } from "next";
-import { checkLogin, loginInfo, LoginInfoProps } from "@/lib/checkLogin";
-import "@/styles/common.scss";
+import { Inter } from "next/font/google";
+import { Providers } from "@/lib/Providers";
+import { LoginProvider } from "@/contexts/LoginContext";
+import ClientLayoutInner from "@/components/ClientLayoutInner";
 
-const MyApp: NextPage<AppProps> = ({
-  Component,
-  pageProps,
-  router,
-}: AppProps) => {
-  const [loginInfoProp, setLoginInfoProp] = useState<LoginInfoProps | null>(loginInfo);
-  const [loginLoading, setLoginLoading] = useState(true);
-  const additionalProps = {
-    loginInfo: loginInfoProp,
-    loginLoading: loginLoading,
-  };
+const inter = Inter({ subsets: ["latin"] });
 
-  useEffect(() => {
-    (async () => {
-      try {
-        const info = await checkLogin();
-        setLoginInfoProp(info);
-        setLoginLoading(false);
-      } catch (error) {
-        console.error(
-          "An error occurred while checking the login status:",
-          error
-        );
-      }
-    })();
-  }, [router.pathname]);
-
-  return <Component {...pageProps} {...additionalProps} />;
-};
-
-export default MyApp;
+export default function MyApp({ Component, pageProps }: AppProps) {
+  return (
+    <div className={inter.className}>
+      <Providers>
+        <LoginProvider>
+          <ClientLayoutInner>
+            <Component {...pageProps} />
+          </ClientLayoutInner>
+        </LoginProvider>
+      </Providers>
+    </div>
+  );
+}

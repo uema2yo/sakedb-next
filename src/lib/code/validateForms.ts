@@ -1,6 +1,6 @@
 import { getDocuments } from "@/lib/firebase/getDocuments";
 import type { GetCollectionConfig } from "@/types/getDocumentsConfig";
-import { countChars, isDateInputSupported } from "../util";
+import { countChars, isDateInputSupported } from "@/lib/utils";
 import store from "@/lib/store";
 
 export const validateForms = async (

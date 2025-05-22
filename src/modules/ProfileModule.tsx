@@ -9,7 +9,7 @@ import Loading from "@/components/Loading";
 import ImageUploader from "@/components/Form/ImageUploader";
 import EditableFields from "@/components/Form/EditableFields";
 import { validateForms } from "@/lib/code/validateForms";
-import { formatDate, generateUniqueToken, getLabelFromCode } from "@/lib/util";
+import { formatDate, generateUniqueToken, getLabelFromCode } from "@/lib/utils";
 import { GENDER_CODES } from "@/constants";
 import type { GetCollectionConfig } from "@/types/getDocumentsConfig";
 import type { DocumentData } from "firebase/firestore";
