@@ -1,5 +1,7 @@
 {
   "css.lint.unknownAtRules": "ignore",
   "postcss.enable": true,
+  "css.validate": false,
+  "scss.validate": false,
   "vue.updateImportsOnFileMove.enabled": true
 }

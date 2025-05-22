@@ -21,7 +21,7 @@ const Logout: React.FC<LogoutProps> = ({ closeDialog }) => {
   };
   return (
     <>
-      <p>本当にログアウトしますか？</p>
+      <p className="custom">本当にログアウトしますか？</p>
       <button onClick={logout}>ログアウト</button>
     </>
   );

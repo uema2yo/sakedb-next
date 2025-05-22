@@ -568,7 +568,6 @@ const ProfileModule = (props: Props) => {
         <Loading />
       ) : (
         <article>
-          <h2></h2>
           <figure className="">
             {props.uid && !props.readonly ? (
               <ImageUploader

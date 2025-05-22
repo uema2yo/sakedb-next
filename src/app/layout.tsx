@@ -1,9 +1,12 @@
 import { ReactNode } from "react";
 import { Inter } from "next/font/google";
-import "@/styles/globals.css";
 import { Providers } from "@/lib/Providers";
 import ClientLayoutInner from "@/components/ClientLayoutInner";
 import { LoginProvider } from "@/contexts/LoginContext";
+
+import "@/styles/globals.css";
+import "@/styles/tailwind.css";
+import "@/styles/main.scss";
 
 const inter = Inter({ subsets: ["latin"] });
 
