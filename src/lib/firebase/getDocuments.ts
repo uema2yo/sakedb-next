@@ -1,29 +1,64 @@
-import type { GetCollectionConfig } from "@/types/getDocumentsConfig";
-import type { DocumentData } from "firebase/firestore";
+import {
+  collection,
+  query,
+  where,
+  orderBy,
+  limit,
+  getDocs,
+  type DocumentData,
+  type WhereFilterOp,
+  type OrderByDirection,
+} from "firebase/firestore";
+import { db } from "./init";
+
+export interface Condition {
+  name: string;
+  operator: WhereFilterOp;
+  value: string | number | boolean;
+}
+
+export interface GetCollectionConfig {
+  collectionName: string;
+  conditions?: Condition[] | null;
+  public_only?: boolean | null;
+  order_by?: {
+    field: string;
+    direction: OrderByDirection;
+  } | null;
+  limit_num?: number | null;
+}
 
 export async function getDocuments(
   configs: GetCollectionConfig[]
 ): Promise<DocumentData[]> {
-  try {
-    const response = await fetch("/api/getDocuments", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(configs),
-    });
+  const results: DocumentData[][] = [];
 
-    if (!response.ok) {
-      throw new Error(`Failed to fetch documents: ${response.statusText}`);
+  for (const config of configs) {
+    const { collectionName, conditions, public_only, order_by, limit_num } = config;
+    const ref = collection(db, collectionName);
+    const constraints: any[] = [];
+
+    if (conditions?.length) {
+      constraints.push(...conditions.map((c) => where(c.name, c.operator, c.value)));
+    }
+    if (public_only) {
+      constraints.push(where("public", "==", true));
+    }
+    if (order_by) {
+      constraints.push(orderBy(order_by.field, order_by.direction));
+    }
+    if (limit_num) {
+      constraints.push(limit(limit_num));
     }
 
-    const data = await response.json();
-    return data;
-  } catch (error: unknown) {
-    if (error instanceof Error) {
-      throw new Error(error.message);
-    } else {
-      throw new Error("An unknown error occurred");
-    }
+    const q = query(ref, ...constraints);
+    const snapshot = await getDocs(q);
+
+    results.push(snapshot.docs.map((doc) => ({
+      id: doc.id,
+      ...doc.data()
+    })));
   }
+
+  return results.flat();
 }

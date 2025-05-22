@@ -47,7 +47,6 @@ const EditableFields = (props: Props) => {
   const targetValue =
     targetField && "value" in targetField ? targetField.value : undefined;
   const limit = targetField && "value" in targetField ? `${targetField.limit} 文字` : "";
-  console.log("targetValue", targetValue);
 
   const [isEditing, setIsEditing] = useState(false);
   const [editedFields, setEditedFields] = useState(() =>
@@ -200,7 +199,9 @@ const EditableFields = (props: Props) => {
     <>
       {loading ? (
         <span>Loading...</span>
-      ) : isEditing && props.userLoggedIn ? (
+      )
+      :
+      isEditing && props.userLoggedIn ? (
         <form
           onSubmit={(event) => {
             event.preventDefault();
@@ -397,16 +398,15 @@ const EditableFields = (props: Props) => {
             </button>
           )}
         </form>
-      ) : userLoggedIn ? (
+      ) 
+      : userLoggedIn ? (
         // Button to start editing
         <>
           {props.children}
           <button onClick={startEditing}>Edit</button>
         </>
-      ) : isPublic ? (
-        // Display for public view
-        <>{props.children}</>
-      ) : null}
+      )
+      : null}
     </>
   );
 };

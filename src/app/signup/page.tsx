@@ -6,7 +6,7 @@ import { auth } from "@/lib/firebase/init";
 import { addDocument } from "@/lib/firebase/addDocument";
 import { User, createUserWithEmailAndPassword } from "firebase/auth";
 import { validateForms } from "@/lib/code/validateForms";
-import SignupButton from "@/components/SignupButton";
+import SignupDialogButton from "@/components/SignupDialogButton";
 import { createUser } from "@/lib/firebase/createUser";
 import { useLoginContext } from "@/contexts/LoginContext";
 import Loading from "@/components/Loading";
@@ -145,7 +145,7 @@ const Page = () => {
         :
         <>
         {validateEmailExists.message !== "" && <p>{validateEmailExists.message}</p>}
-        <SignupButton />
+        <SignupDialogButton />
         </>}
         </main>
   );

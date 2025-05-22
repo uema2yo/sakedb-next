@@ -3,7 +3,9 @@ import { SITE_TITLE } from "@/constants";
 import Login from "@/components/Form/Login";
 import Logout from "@/components/Form/Logout";
 import Loading from "@/components/Loading";
-import SignupButton from "./SignupButton";
+import SignupDialogButton from "./SignupDialogButton";
+import { useSelector } from "react-redux";
+import { RootState } from "@/lib/store";
 
 type HeaderProps = {
   onDialogToggleButtonClick: (
@@ -26,16 +28,19 @@ const Header: FC<HeaderProps> = ({
   loginInfo,
   loginLoading,
 }) => {
+
+  const uid = useSelector((state: RootState) => state.auth.uid) as string;
+
   function closeDialog(): void {
     throw new Error("Function not implemented.");
   }
 
   return (
-    <header>
+    <header >
       <h1>{SITE_TITLE}</h1>
       {loginLoading ? (
         <Loading />
-      ) : loginInfo?.uid ? (
+      ) : uid ? (
         <button
           onClick={() =>
             onDialogToggleButtonClick("logout", "ログアウト確認", (closeDialog) => (
@@ -56,7 +61,7 @@ const Header: FC<HeaderProps> = ({
           >
             ログイン
           </button>
-          <SignupButton />
+          <SignupDialogButton />
         </>
       )}
     </header>

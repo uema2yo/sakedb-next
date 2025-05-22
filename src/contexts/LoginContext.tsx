@@ -4,6 +4,8 @@ import { createContext, ReactNode, useContext, useEffect, useState } from "react
 import { checkLogin, loginInfo as defaultLoginInfo, LoginInfoProps } from "@/lib/checkLogin";
 import { useDispatch } from "react-redux";
 import { clearUid, setUid } from "@/lib/store/authSlice";
+import { onAuthStateChanged } from "firebase/auth";
+import { auth } from "@/lib/firebase/init";
 
 type LoginContextValue = {
   loginInfo: LoginInfoProps | null;
@@ -23,6 +25,32 @@ export function LoginProvider({ children }: { children: ReactNode }) {
   const dispatch = useDispatch();
 
   useEffect(() => {
+      const unsubscribe = onAuthStateChanged(auth, async (user) => {
+      setLoginLoading(true);
+      if (user) {
+        try {
+          const info = await checkLogin(); // トークン取得や Firestore 連携など含まれている想定
+          setLoginInfo(info);
+
+          if (info?.uid) {
+            dispatch(setUid(info.uid));
+          } else {
+            dispatch(clearUid());
+          }
+        } catch (err) {
+          console.error("checkLogin error", err);
+          setLoginInfo(null);
+          dispatch(clearUid());
+        }
+      } else {
+        setLoginInfo(null);
+        dispatch(clearUid());
+      }
+      setLoginLoading(false);
+    });
+
+    return () => unsubscribe();  
+    /*
     (async () => {
       try {
         const info = await checkLogin();
@@ -39,7 +67,7 @@ export function LoginProvider({ children }: { children: ReactNode }) {
       } finally {
         setLoginLoading(false);
       }
-    })();
+    })();*/
   }, [dispatch]);
 
   return (

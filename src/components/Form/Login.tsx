@@ -1,6 +1,6 @@
 "use client";
 import { useState, useEffect, FormEvent } from "react";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { auth } from "@/lib/firebase/init";
 import {
   onAuthStateChanged,
@@ -13,11 +13,13 @@ const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const router = useRouter();
+  const pathname = usePathname();
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
-      if (user) {
-        router.refresh();
+      console.log("replace", user, pathname);
+      if (user && pathname) {
+        router.replace(pathname);
       }
     });
     return () => unsubscribe();

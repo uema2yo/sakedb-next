@@ -13,6 +13,12 @@ import { formatDate, generateUniqueToken, getLabelFromCode } from "@/lib/util";
 import { GENDER_CODES } from "@/constants";
 import type { GetCollectionConfig } from "@/types/getDocumentsConfig";
 import type { DocumentData } from "firebase/firestore";
+import { read } from "node:fs";
+
+interface Props {
+  uid: string;
+  readonly: boolean;
+}
 
 interface UserProfileItem {
   [key: string]: {
@@ -25,77 +31,88 @@ interface UserProfileItem {
 const altUserId = `user-${generateUniqueToken(12)}`;
 const altUserName = `ユーザー${generateUniqueToken(6)}`;
 
-const ProfileModule = () => {
+const ProfileModule = (props: Props) => {
+  
   const uid = useSelector((state: RootState) => state.auth.uid) as string;
-  const profileImageUrl = useSelector(
-    (state: RootState) => state.profileImage.url
-  );
   const profileConfig: {
     [key: string]: GetCollectionConfig;
   } = {
     id: {
       collectionName: "b_user_id",
-      conditions: [{ name: "uid", operator: "==", value: uid }],
+      conditions: [{ name: "uid", operator: "==", value: props.uid }],
       public_only: false,
       order_by: { field: "timestamp", direction: "desc" },
       limit_num: 1,
     },
     name: {
       collectionName: "b_user_name",
-      conditions: [{ name: "uid", operator: "==", value: uid }],
+      conditions: [{ name: "uid", operator: "==", value: props.uid }],
+      public_only: false,
+      order_by: { field: "timestamp", direction: "desc" },
+      limit_num: 1,
+    },
+    iamgeUrl: {
+      collectionName: "b_user_profileImage",
+      conditions: [{ name: "uid", operator: "==", value: props.uid }],
       public_only: false,
       order_by: { field: "timestamp", direction: "desc" },
       limit_num: 1,
     },
     gender: {
       collectionName: "b_user_gender",
-      conditions: [{ name: "uid", operator: "==", value: uid }],
+      conditions: [{ name: "uid", operator: "==", value: props.uid }],
       public_only: false,
       order_by: { field: "timestamp", direction: "desc" },
       limit_num: 1,
     },
     birthdate: {
       collectionName: "b_user_birthdate",
-      conditions: [{ name: "uid", operator: "==", value: uid }],
+      conditions: [{ name: "uid", operator: "==", value: props.uid }],
       public_only: false,
       order_by: { field: "timestamp", direction: "desc" },
       limit_num: 1,
     },
     residenceRegion: {
       collectionName: "b_user_residenceRegion",
-      conditions: [{ name: "uid", operator: "==", value: uid }],
+      conditions: [{ name: "uid", operator: "==", value: props.uid }],
       public_only: false,
       order_by: { field: "timestamp", direction: "desc" },
       limit_num: 1,
     },
     residenceCountry: {
       collectionName: "b_user_residenceCountry",
-      conditions: [{ name: "uid", operator: "==", value: uid }],
+      conditions: [{ name: "uid", operator: "==", value: props.uid }],
       public_only: false,
       order_by: { field: "timestamp", direction: "desc" },
       limit_num: 1,
     },
     residencePrefecture: {
       collectionName: "b_user_residencePrefecture",
-      conditions: [{ name: "uid", operator: "==", value: uid }],
+      conditions: [{ name: "uid", operator: "==", value: props.uid }],
       public_only: false,
       order_by: { field: "timestamp", direction: "desc" },
       limit_num: 1,
     },
     residenceCity: {
       collectionName: "b_user_residenceCity",
-      conditions: [{ name: "uid", operator: "==", value: uid }],
+      conditions: [{ name: "uid", operator: "==", value: props.uid }],
       public_only: false,
       order_by: { field: "timestamp", direction: "desc" },
       limit_num: 1,
     },
     introduction: {
       collectionName: "b_user_introduction",
-      conditions: [{ name: "uid", operator: "==", value: uid }],
+      conditions: [{ name: "uid", operator: "==", value: props.uid }],
       public_only: false,
       order_by: { field: "timestamp", direction: "desc" },
       limit_num: 1,
     },
+  };
+  
+  const getProfileImageUrl = async () => {
+    const res = await getDocuments([profileConfig.iamgeUrl]);
+    console.log("image", res);
+    return res[0].value;
   };
 
   const [userProfileItem, setUserProfileItem] = useState<UserProfileItem>({});
@@ -108,6 +125,9 @@ const ProfileModule = () => {
   const [document, setDocument] = useState<
     Record<string, { public: boolean; value: string | number | boolean }>
   >({});
+  const [profileImageUrl, setProfileImageUrl] = useState(useSelector(
+    (state: RootState) => state.profileImage.url
+  ));
   const field = useMemo(
     () => ({
       id: {
@@ -503,6 +523,12 @@ const ProfileModule = () => {
   };
 
   useEffect(() => {
+    if(props.readonly) {
+      (async() => {
+        const url = await getProfileImageUrl();
+        setProfileImageUrl(url);
+      })();
+    }
     setSelectOptionItems.region();
     setSelectOptionItems.country();
     setSelectOptionItems.prefecture();
@@ -543,16 +569,8 @@ const ProfileModule = () => {
       ) : (
         <article>
           <h2></h2>
-          <figure>
-            <figcaption>
-              {document.id?.value && document.name?.value && (
-                <>
-                  {document.name?.value}（{document.id?.value}
-                  ）さんのプロフィール
-                </>
-              )}
-            </figcaption>
-            {uid ? (
+          <figure className="">
+            {props.uid && !props.readonly ? (
               <ImageUploader
                 collectionName="b_user_profileImage"
                 options={{
@@ -563,16 +581,34 @@ const ProfileModule = () => {
                 }}
               />
             ) : (
-              <img src={profileImageUrl} />
+              profileImageUrl !== "" && 
+              <>
+              <img src={profileImageUrl} alt={`${document.name.value} のプロフィール画像`} />
+              <figcaption>
+              {document.id?.value && document.name?.value && (
+                <>
+                  {document.name?.value}（@{document.id?.value}
+                  ）
+                </>
+              )}
+              </figcaption>
+              </>
             )}
           </figure>
           <section>
             <h3>ユーザーID</h3>
-            {
+            {props.readonly ? 
+              userProfileItem.id.public ? 
+                <>
+                {userProfileItem.id.value}
+                </>
+                :
+                <span>非公開</span>
+              :
               <EditableFields
                 field={field.id}
                 isPublic={userProfileItem.id.public === true}
-                userLoggedIn={uid !== ""}
+                userLoggedIn={props.uid !== ""}
                 validate={validate}
                 defaultEditMode={document.id?.value === undefined}
                 save={handleSave.id}
@@ -584,11 +620,18 @@ const ProfileModule = () => {
           </section>
           <section>
             <h3>ユーザー名</h3>
-            {
+            {props.readonly ? 
+              userProfileItem.name.public ? 
+                <>
+                {userProfileItem.name.value}
+                </>
+                :
+                <span>非公開</span>
+              :
               <EditableFields
                 field={field.name}
                 isPublic={userProfileItem.name.public === true}
-                userLoggedIn={uid !== ""}
+                userLoggedIn={props.uid !== ""}
                 defaultEditMode={document.name?.value === undefined}
                 save={handleSave.name}
               >
@@ -600,11 +643,22 @@ const ProfileModule = () => {
 
           <section>
             <h3>性別</h3>
-            {
+            {props.readonly ? 
+              userProfileItem.gender.public ? 
+                <>
+                {getLabelFromCode(
+                  GENDER_CODES,
+                  Number(userProfileItem.gender.value),
+                  "ja"
+                )}
+                </>
+                :
+                <span>非公開</span>
+              :
               <EditableFields
                 field={field.gender}
                 isPublic={userProfileItem.gender.public === true}
-                userLoggedIn={uid !== ""}
+                userLoggedIn={props.uid !== ""}
                 validate={validate}
                 defaultEditMode={document.gender?.value === undefined}
                 save={handleSave.gender}
@@ -620,11 +674,18 @@ const ProfileModule = () => {
           </section>
           <section>
             <h3>生年月日</h3>
-            {
+            {props.readonly ? 
+              userProfileItem.birthdate.public ? 
+                <>
+                {formatDate(userProfileItem.birthdate.value as string, "ja")}
+                </>
+                :
+                <span>非公開</span>
+              :
               <EditableFields
                 field={field.birthdate}
                 isPublic={userProfileItem.birthdate.public === true}
-                userLoggedIn={uid !== ""}
+                userLoggedIn={props.uid !== ""}
                 validate={validate}
                 defaultEditMode={document.birthdate?.value === undefined}
                 save={handleSave.birthdate}
@@ -638,11 +699,23 @@ const ProfileModule = () => {
           </section>
           <section>
             <h3>在住地域</h3>
-            {
+            {props.readonly ? 
+              userProfileItem.residenceRegion.public ? 
+                <>
+                {subregions &&
+                  getLabelFromCode(
+                    subregions,
+                    userProfileItem.residenceRegion.value as string,
+                    "ja"
+                  )}
+                </>
+                :
+                <span>非公開</span>
+              :
               <EditableFields
                 field={field.residenceRegion}
                 isPublic={userProfileItem.residenceRegion.public === true}
-                userLoggedIn={uid !== ""}
+                userLoggedIn={props.uid !== ""}
                 validate={validate}
                 defaultEditMode={document.residenceRegion?.value === undefined}
                 save={handleSave.residenceRegion}
@@ -662,11 +735,23 @@ const ProfileModule = () => {
           </section>
           <section>
             <h3>在住国</h3>
-            {
+            {props.readonly ? 
+              userProfileItem.residenceCountry.public ? 
+                <>
+                {countries &&
+                  getLabelFromCode(
+                    countries,
+                    userProfileItem.residenceCountry.value as string,
+                    "ja"
+                  )}
+                </>
+                :
+                <span>非公開</span>
+              :
               <EditableFields
                 field={field.residenceCountry}
                 isPublic={userProfileItem.residenceCountry.public === true}
-                userLoggedIn={uid !== ""}
+                userLoggedIn={props.uid !== ""}
                 validate={validate}
                 defaultEditMode={document.residenceCountry?.value === undefined}
                 save={handleSave.residenceCountry}
@@ -686,11 +771,23 @@ const ProfileModule = () => {
           </section>
           <section>
             <h3>在住都道府県</h3>
-            {
+            {props.readonly ? 
+              userProfileItem.residencePrefecture.public ? 
+                <>
+                {prefectures &&
+                  getLabelFromCode(
+                    prefectures,
+                    Number(userProfileItem.residencePrefecture.value),
+                    "ja"
+                  )}
+                </>
+                :
+                <span>非公開</span>
+              :
               <EditableFields
                 field={field.residencePrefecture}
                 isPublic={userProfileItem.residencePrefecture.public === true}
-                userLoggedIn={uid !== ""}
+                userLoggedIn={props.uid !== ""}
                 validate={validate}
                 defaultEditMode={
                   document.residencePrefecture?.value === undefined
@@ -714,11 +811,23 @@ const ProfileModule = () => {
           </section>
           <section>
             <h3>在住市区町村</h3>
-            {
+            {props.readonly ? 
+              userProfileItem.residenceCity.public ? 
+                <>
+                {cities &&
+                  getLabelFromCode(
+                    cities,
+                    Number(userProfileItem.residenceCity.value),
+                    "ja"
+                  )}
+                </>
+                :
+                <span>非公開</span>
+              :
               <EditableFields
                 field={field.residenceCity}
                 isPublic={userProfileItem.residenceCity.public === true}
-                userLoggedIn={uid !== ""}
+                userLoggedIn={props.uid !== ""}
                 validate={validate}
                 defaultEditMode={document.residenceCity?.value === undefined}
                 save={handleSave.residenceCity}
@@ -738,11 +847,18 @@ const ProfileModule = () => {
           </section>
           <section>
             <h3>自己紹介</h3>
-            {
+            {props.readonly ? 
+              userProfileItem.introduction.public ? 
+                <>
+                {userProfileItem.introduction.value}
+                </>
+                :
+                <span>非公開</span>
+              :
               <EditableFields
                 field={field.introduction}
                 isPublic={userProfileItem.introduction.public === true}
-                userLoggedIn={uid !== ""}
+                userLoggedIn={props.uid !== ""}
                 validate={validate}
                 defaultEditMode={document.introduction?.value === undefined}
                 save={handleSave.introduction}
