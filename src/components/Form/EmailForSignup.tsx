@@ -1,18 +1,31 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import Router from 'next/router'
+import { useRouter } from "next/navigation";
 import { auth } from "@/lib/firebase/init";
-import { sendSignInLinkToEmail } from "firebase/auth";
+import { sendSignInLinkToEmail, signOut } from "firebase/auth";
 import { DOMAIN, LOCAL_DOMAIN } from "@/constants";
 import { validateForms } from "@/lib/code/validateForms"; 
+import { Button } from "../ui/button";
 
-const EmailForSignup = () => {
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+
+interface LogoutProps {
+  closeDialog: () => void;
+}
+
+const EmailForSignup: React.FC<LogoutProps> = ({ closeDialog }) => {
   const [email, setEmail] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
   const [emailDisabled, setEmailDisabled] = useState(true);
   const [submitted, setSubmitted] = useState(false);
-
   const handleChangeEmail = async(value: string) => {
     setEmail(value);
     const validate = await validateForms("email", value, false)
@@ -45,6 +58,18 @@ const EmailForSignup = () => {
     }
   };
 
+  const router = useRouter();
+
+  const logout = async () => {
+    try {
+      await signOut(auth);
+      closeDialog();
+      router.replace("/");
+    } catch (error) {
+      console.error("ログアウトに失敗しました。", error);
+    }
+  };
+
   if (submitted) {
     return (
       <div>
@@ -54,16 +79,27 @@ const EmailForSignup = () => {
     ); 
   } else {
     return (
-      <div>
-        <p>受信可能な E メールアドレスをご登録ください。</p>
+      <Dialog>
+        <DialogTrigger>
+          <Button variant="outline">ユーザー登録</Button>
+        </DialogTrigger>
+        <DialogContent className="md:max-w-(--standard-dialog-max-width)">
+          <DialogHeader>
+            <DialogTitle>ユーザー登録</DialogTitle>
+            <DialogDescription>受信可能な E メールアドレスをご登録ください。</DialogDescription>
+          </DialogHeader>
+          <div className="text-center">
         <input
           type="email"
           value={email ?? ""}
           onChange={e => handleChangeEmail(e.target.value)}
         />
-        <button onClick={handleSendEmail} disabled={emailDisabled}>E メールアドレスを登録する</button>
+        <Button variant="outline" onClick={handleSendEmail} disabled={emailDisabled}>E メールアドレスを登録する</Button>
         {errorMessage !=="" && <p className="errorMessage">{errorMessage}</p>}
-      </div>
+
+          </div>
+        </DialogContent>
+      </Dialog>
     );
   }
 };
