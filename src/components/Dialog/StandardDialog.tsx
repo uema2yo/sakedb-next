@@ -7,8 +7,18 @@ import React, {
   useImperativeHandle,
   ReactNode,
 } from "react";
+/*
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog"
+*/
 
-interface DialogProps {
+interface SimpleDialogProps {
   id?: string;
   title?: string;
   slot?: (closeDialog: () => void) => ReactNode;
@@ -20,7 +30,7 @@ export interface DialogComponentHandle {
   closeDialog: () => void;
 }
 
-const Dialog = forwardRef<DialogComponentHandle, DialogProps>(({ id, title, slot }, ref) => {
+const SimpleDialog = forwardRef<DialogComponentHandle, SimpleDialogProps>(({ id, title, slot }, ref) => {
   const [open, setOpen] = useState(false);
   const openRef = useRef(null);
 
@@ -42,5 +52,5 @@ const Dialog = forwardRef<DialogComponentHandle, DialogProps>(({ id, title, slot
     </dialog>
   );
 });
-Dialog.displayName = "Dialog";
-export default Dialog;
+SimpleDialog.displayName = "Dialog";
+export default SimpleDialog;

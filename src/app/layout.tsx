@@ -17,7 +17,9 @@ export const metadata = {
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
-    <html lang="ja">
+    <html lang="ja" className="summer">
+      <head>
+      </head>
       <body className={inter.className}>
         <Providers>
           <LoginProvider>

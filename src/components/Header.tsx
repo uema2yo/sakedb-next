@@ -1,11 +1,13 @@
-import React, { ReactNode, FC } from "react";
+import React, { FC } from "react";
 import { SITE_TITLE } from "@/constants";
-import Login from "@/components/Form/Login";
 import Logout from "@/components/Form/Logout";
 import Loading from "@/components/Loading";
-import SignupDialogButton from "./SignupDialogButton";
 import { useSelector } from "react-redux";
 import { RootState } from "@/lib/store";
+import Title from "./Article/Title";
+import EmailForSignup from "./Form/EmailForSignup";
+import Login from "./Form/Login";
+
 
 type HeaderProps = {
   onDialogToggleButtonClick: (
@@ -24,44 +26,34 @@ type HeaderProps = {
 };
 
 const Header: FC<HeaderProps> = ({
-  onDialogToggleButtonClick,
-  loginInfo,
   loginLoading,
 }) => {
 
   const uid = useSelector((state: RootState) => state.auth.uid) as string;
 
-  function closeDialog(): void {
+  const closeDialog = (): void => {
     throw new Error("Function not implemented.");
   }
 
   return (
-    <header >
-      <h1>{SITE_TITLE}</h1>
+    <header className="grid grid-cols-3 items-center">
+      <div>
+        <Title level="top">{SITE_TITLE}</Title>
+      </div>
       {loginLoading ? (
-        <Loading />
+        <div>
+          <Loading />
+        </div>
       ) : uid ? (
-        <button
-          onClick={() =>
-            onDialogToggleButtonClick("logout", "ログアウト確認", (closeDialog) => (
-              <Logout closeDialog={closeDialog} />
-            ))
-          }
-        >
-          ログアウト
-        </button>
+        <Logout closeDialog={closeDialog} />
       ) : (
         <>
-          <button
-            onClick={() =>
-              onDialogToggleButtonClick("login", "ログイン", (closeDialog) => (
-                <Login />
-              ))
-            }
-          >
-            ログイン
-          </button>
-          <SignupDialogButton />
+          <div>
+            <Login />
+          </div>
+          <div>
+            <EmailForSignup closeDialog={closeDialog} />
+          </div>
         </>
       )}
     </header>

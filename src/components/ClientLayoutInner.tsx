@@ -3,7 +3,7 @@
 import { ReactNode, useRef, useState } from "react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
-import Dialog, { DialogComponentHandle } from "@/components/Dialog/Dialog";
+//import SimpleDialog, { DialogComponentHandle } from "@/components/Dialog/SimpleDialog";
 import { DialogProvider } from "@/contexts/DialogContext";
 import { useLoginContext } from "@/contexts/LoginContext";
 
@@ -11,7 +11,7 @@ export default function ClientLayoutInner(
   { children }: { children: ReactNode }
 ) {
   const { loginInfo, loginLoading } = useLoginContext();
-  const dialogRef = useRef<DialogComponentHandle>(null);
+  //const dialogRef = useRef<DialogComponentHandle>(null);
   const [id, setId] = useState("");
   const [title, setTitle] = useState("");
   const [slot, setSlot] = useState<(closeDialog: () => void) => ReactNode>();
@@ -24,11 +24,11 @@ export default function ClientLayoutInner(
     setId(id);
     setTitle(title);
     setSlot(() => slot); // 必ず関数として渡す
-    dialogRef.current?.openDialog();
+    //dialogRef.current?.openDialog();
   };
 
   const closeDialog = () => {
-    dialogRef.current?.closeDialog();
+    //dialogRef.current?.closeDialog();
   };
 
   return (
@@ -42,7 +42,7 @@ export default function ClientLayoutInner(
       />
       {children}
       <Footer />
-      <Dialog id={id} title={title} slot={slot} ref={dialogRef} />
+      {/*<SimpleDialog id={id} title={title} slot={slot} ref={dialogRef} />*/}
     </DialogProvider>
   );
 }

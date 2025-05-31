@@ -1,5 +1,6 @@
 "use client";
 
+import Title from "@/components/Article/Title";
 import Loading from "@/components/Loading";
 import SignupInformation from "@/components/SignupInformation";
 import { useLoginContext } from "@/contexts/LoginContext";
@@ -17,8 +18,8 @@ const Mypage = () => {
   return(
       <main>
         <header>
-            <h2>マイページ</h2>
-        </header>{uid}
+            <Title level="main">マイページ</Title>
+        </header>
         { uid ?
         <ProfileModule uid={uid} readonly={false} />
         :

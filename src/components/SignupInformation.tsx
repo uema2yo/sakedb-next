@@ -1,6 +1,9 @@
-import SignupDialogButton from "./SignupDialogButton";
+import EmailForSignup from "./Form/EmailForSignup";
 
 const SignupInformation = () => {
+  const closeDialog = (): void => {
+    throw new Error("Function not implemented.");
+  }
 
   return (
     <article>
@@ -9,7 +12,7 @@ const SignupInformation = () => {
       </header>
       <p>ユーザー登録して…</p>
       <footer>
-        <SignupDialogButton />
+        <EmailForSignup closeDialog={closeDialog} />
       </footer>
     </article>
   );

@@ -1,12 +1,13 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { auth } from "@/lib/firebase/init";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { sendSignInLinkToEmail, signOut } from "firebase/auth";
+import { auth } from "@/lib/firebase/init";
 import { DOMAIN, LOCAL_DOMAIN } from "@/constants";
-import { validateForms } from "@/lib/code/validateForms"; 
-import { Button } from "../ui/button";
+import { z } from "zod";
 
 import {
   Dialog,
@@ -16,29 +17,51 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import {
+  Form,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormControl,
+  FormMessage,
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import SubmitFooter from "./SubmitFooter";
+import { Check } from "lucide-react";
 
-interface LogoutProps {
-  closeDialog: () => void;
-}
+const emailSchema = z.object({
+  email: z.string().email({ message: "有効なメールアドレスを入力してください。" }),
+});
 
-const EmailForSignup: React.FC<LogoutProps> = ({ closeDialog }) => {
-  const [email, setEmail] = useState("");
-  const [errorMessage, setErrorMessage] = useState("");
-  const [emailDisabled, setEmailDisabled] = useState(true);
+type EmailFormValues = z.infer<typeof emailSchema>;
+
+//const EmailForSignup: React.FC<EmailForSignupProps> = () => {
+const EmailForSignup = () => {
   const [submitted, setSubmitted] = useState(false);
-  const handleChangeEmail = async(value: string) => {
-    setEmail(value);
-    const validate = await validateForms("email", value, false)
-    if (validate.result) {
-      setEmailDisabled(false);
-      setErrorMessage("");
-    } else {
-      setEmailDisabled(true);
-      setErrorMessage(validate.message || "");
-    }
-  }
+  const [description, setDescription] = useState("受信可能な E メールアドレスをご登録ください。");
+  const [submitDisabled, setSubmitDisabled] = useState(true);
+  const [emailValidated, setEmailValidated] = useState(<></>);
 
-  const handleSendEmail = async () => {
+  const form = useForm<EmailFormValues>({
+    resolver: zodResolver(emailSchema),
+    defaultValues: {
+      email: "",
+    },
+  });
+
+  useEffect(() => {
+    const email = form.watch("email");
+    const emailResult = emailSchema.shape.email.safeParse(email);
+    if (emailResult.success) {
+      setEmailValidated(<Check className="text-success inline-block" size={20} absoluteStrokeWidth />);
+    } else {
+      setEmailValidated(<></>);
+    }
+    setSubmitDisabled(!emailResult.success || !form.formState.isValid);
+  }, [form.watch("email"), form.formState.isValid]);
+
+  const handleSendEmail = async (data: EmailFormValues) => {
     const signupUrl =
       process.env.NEXT_PUBLIC_LOCAL === "TRUE"
         ? `http://${LOCAL_DOMAIN}/signup`
@@ -47,61 +70,99 @@ const EmailForSignup: React.FC<LogoutProps> = ({ closeDialog }) => {
       url: signupUrl,
       handleCodeInApp: true,
     };
-    const valid = await validateForms("email", email, false)
-    
+
     try {
-      valid.result && await sendSignInLinkToEmail(auth, email, actionCodeSettings);
-      window.localStorage.setItem("emailForSignup", email); // localStorage に保存するのは不安なので Firestore で持つように変更する
+      const res = await fetch("/api/checkEmailExists", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: data.email }),
+      });
+      const result = await res.json();
+      if (result.exists) {
+        form.setError("email", {
+          type: "manual",
+          message: "このメールアドレスはすでに登録されています。",
+        });
+        return;
+      }
+
+      await sendSignInLinkToEmail(auth, data.email, actionCodeSettings);
+      window.localStorage.setItem("emailForSignup", data.email);
       setSubmitted(true);
+      setDescription("");
     } catch (error) {
-      console.error(error);
+      console.error("メール送信エラー:", error);
     }
   };
 
-  const router = useRouter();
+  return (
+    <Dialog>
+      <DialogTrigger asChild>
+        <Button variant="link">ユーザー登録</Button>
+      </DialogTrigger>
+      <DialogContent className="sm:max-w-(--standard-dialog-max-width)">
+        <DialogHeader>
+          <DialogTitle>ユーザー登録</DialogTitle>
+          {description !== "" && (
+            <DialogDescription>{description}</DialogDescription>
+          )}
+        </DialogHeader>
 
-  const logout = async () => {
-    try {
-      await signOut(auth);
-      closeDialog();
-      router.replace("/");
-    } catch (error) {
-      console.error("ログアウトに失敗しました。", error);
-    }
-  };
-
-  if (submitted) {
-    return (
-      <div>
-        <p>{email} に認証メールを送信しました。</p>
-        <p>メール本文に記載してある認証リンクにアクセスするとユーザー登録画面が開きます。</p>
-      </div>
-    ); 
-  } else {
-    return (
-      <Dialog>
-        <DialogTrigger>
-          <Button variant="outline">ユーザー登録</Button>
-        </DialogTrigger>
-        <DialogContent className="md:max-w-(--standard-dialog-max-width)">
-          <DialogHeader>
-            <DialogTitle>ユーザー登録</DialogTitle>
-            <DialogDescription>受信可能な E メールアドレスをご登録ください。</DialogDescription>
-          </DialogHeader>
-          <div className="text-center">
-        <input
-          type="email"
-          value={email ?? ""}
-          onChange={e => handleChangeEmail(e.target.value)}
-        />
-        <Button variant="outline" onClick={handleSendEmail} disabled={emailDisabled}>E メールアドレスを登録する</Button>
-        {errorMessage !=="" && <p className="errorMessage">{errorMessage}</p>}
-
+        {submitted ? (
+          <div className="text-center space-y-2">
+            <p>{form.getValues("email")} に認証メールを送信しました。</p>
+            <p>
+              メール本文に記載してある認証リンクにアクセスするとユーザー登録画面が開きます。
+            </p>
           </div>
-        </DialogContent>
-      </Dialog>
-    );
-  }
+        ) : (
+          <div className="w-full max-w-md mx-auto">
+            <Form {...form}>
+              <form
+                onSubmit={form.handleSubmit(handleSendEmail)}
+                className="space-y-6"
+              >
+                <FormField
+                  control={form.control}
+                  name="email"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>メールアドレス</FormLabel>
+                      <FormControl>
+                        <>
+                          <Input
+                            type="email"
+                            placeholder="example@example.com"
+                            {...field}
+                          />
+                          <p className="flex items-center text-secondary text-sm">
+                            有効なメールアドレスを入力してください。
+                            {emailValidated}
+                          </p>
+                        </>
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <SubmitFooter>
+                  <Button
+                    type="submit"
+                    variant="primary"
+                    size="lg"
+                    disabled={submitDisabled}
+                    className="w-full"
+                  >
+                    E メールアドレスを登録する
+                  </Button>
+                </SubmitFooter>
+              </form>
+            </Form>
+          </div>
+        )}
+      </DialogContent>
+    </Dialog>
+  );
 };
 
 export default EmailForSignup;

@@ -1,15 +1,15 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { useRouter } from "next/router";
+import { useRouter } from "next/navigation";
 import { auth } from "@/lib/firebase/init";
 import { addDocument } from "@/lib/firebase/addDocument";
 import { User, createUserWithEmailAndPassword } from "firebase/auth";
 import { validateForms } from "@/lib/code/validateForms";
-import SignupDialogButton from "@/components/SignupDialogButton";
 import { createUser } from "@/lib/firebase/createUser";
 import { useLoginContext } from "@/contexts/LoginContext";
 import Loading from "@/components/Loading";
+import EmailForSignup from "@/components/Form/EmailForSignup";
 
 const Page = () => {
   const { loginLoading } = useLoginContext();
@@ -24,12 +24,6 @@ const Page = () => {
   const [submitDisabled,setSubmitDisabled] = useState(true);
 
   const router = useRouter();
-  
-  if (loginLoading) return <Loading />;
-
-  useEffect(() => {
-    setEmail(window.localStorage.getItem("emailForSignup") || "");
-  },[]);
 
   const addUserAccount = async (user: User) => {
     const currentPath = window.location.pathname;
@@ -84,6 +78,10 @@ const Page = () => {
   };
 
   useEffect(() => {
+    setEmail(window.localStorage.getItem("emailForSignup") || "");
+  },[]);
+
+  useEffect(() => {
     if (
       validateUserId?.result &&
       validatePassword?.result &&
@@ -99,6 +97,8 @@ const Page = () => {
       setErrorMessageConfirmPassword("");
     }
   }, [userId, password, confirmPassword, validateUserId, validatePassword]);
+
+  if (loginLoading) return <Loading />;
 
   return (
       <main>
@@ -145,7 +145,7 @@ const Page = () => {
         :
         <>
         {validateEmailExists.message !== "" && <p>{validateEmailExists.message}</p>}
-        <SignupDialogButton />
+        <EmailForSignup />
         </>}
         </main>
   );
