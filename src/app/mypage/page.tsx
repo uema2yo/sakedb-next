@@ -16,7 +16,7 @@ const Mypage = () => {
   if (loginLoading) return <Loading />;
 
   return(
-      <main>
+      <>
         <header>
             <Title level="main">マイページ</Title>
         </header>
@@ -25,7 +25,7 @@ const Mypage = () => {
         :
         <SignupInformation />
         }
-      </main>
+      </>
   );
 }
 

@@ -40,7 +40,9 @@ export default function ClientLayoutInner(
         loginLoading={loginLoading}
         onDialogToggleButtonClick={onDialogToggleButtonClick}
       />
+      <main className="pt-[100px] p-4 bg-white">
       {children}
+      </main>
       <Footer />
       {/*<SimpleDialog id={id} title={title} slot={slot} ref={dialogRef} />*/}
     </DialogProvider>

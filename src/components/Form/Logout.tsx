@@ -33,7 +33,7 @@ const Logout: React.FC<LogoutProps> = ({ closeDialog }) => {
     <>
       <Dialog>
         <DialogTrigger asChild>
-          <Button variant="link">ログアウト</Button>
+          <Button variant="link_default">ログアウト</Button>
         </DialogTrigger>
         <DialogContent className="sm:max-w-(--standard-dialog-max-width)">
           <DialogHeader>

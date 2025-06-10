@@ -1,13 +1,15 @@
 "use client";
 
+
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
+import { doc, setDoc, serverTimestamp } from "firebase/firestore";
+import { sendSignInLinkToEmail } from "firebase/auth";
+import { auth, db } from "@/lib/firebase/init";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { sendSignInLinkToEmail, signOut } from "firebase/auth";
-import { auth } from "@/lib/firebase/init";
-import { DOMAIN, LOCAL_DOMAIN } from "@/constants";
 import { z } from "zod";
+import { v4 as uuidv4 } from "uuid";
+import { DOMAIN, LOCAL_DOMAIN } from "@/constants";
 
 import {
   Dialog,
@@ -31,15 +33,18 @@ import SubmitFooter from "./SubmitFooter";
 import { Check } from "lucide-react";
 
 const emailSchema = z.object({
-  email: z.string().email({ message: "有効なメールアドレスを入力してください。" }),
+  email: z.string().email({ message: "有効なメールアドレスをご入力ください。" }),
 });
+
+interface EmailForSignupProps {
+  variant?: "outline" | "link_default";
+}
 
 type EmailFormValues = z.infer<typeof emailSchema>;
 
-//const EmailForSignup: React.FC<EmailForSignupProps> = () => {
-const EmailForSignup = () => {
+const EmailForSignup = ({ variant = "link_default" }: EmailForSignupProps) => {
   const [submitted, setSubmitted] = useState(false);
-  const [description, setDescription] = useState("受信可能な E メールアドレスをご登録ください。");
+  const [description, setDescription] = useState("受信可能な E メールアドレスをごご送信ください。");
   const [submitDisabled, setSubmitDisabled] = useState(true);
   const [emailValidated, setEmailValidated] = useState(<></>);
 
@@ -61,6 +66,32 @@ const EmailForSignup = () => {
     setSubmitDisabled(!emailResult.success || !form.formState.isValid);
   }, [form.watch("email"), form.formState.isValid]);
 
+const handleSendEmail = async (data: EmailFormValues) => {
+  const token = uuidv4();
+  const signupUrl =
+    process.env.NEXT_PUBLIC_LOCAL === "TRUE"
+      ? `http://${LOCAL_DOMAIN}/signup?token=${token}`
+      : `https://${DOMAIN}/signup?token=${token}`;
+
+  const actionCodeSettings = {
+    url: signupUrl,
+    handleCodeInApp: true,
+  };
+
+  try {
+    await setDoc(doc(db, "signup_tokens", token), {
+      email: data.email,
+      createdAt: serverTimestamp(),
+    });
+
+    await sendSignInLinkToEmail(auth, data.email, actionCodeSettings);
+    setSubmitted(true);
+    setDescription("");
+  } catch (error) {
+    console.error("メール送信エラー:", error);
+  }
+};
+  /*
   const handleSendEmail = async (data: EmailFormValues) => {
     const signupUrl =
       process.env.NEXT_PUBLIC_LOCAL === "TRUE"
@@ -72,20 +103,6 @@ const EmailForSignup = () => {
     };
 
     try {
-      const res = await fetch("/api/checkEmailExists", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: data.email }),
-      });
-      const result = await res.json();
-      if (result.exists) {
-        form.setError("email", {
-          type: "manual",
-          message: "このメールアドレスはすでに登録されています。",
-        });
-        return;
-      }
-
       await sendSignInLinkToEmail(auth, data.email, actionCodeSettings);
       window.localStorage.setItem("emailForSignup", data.email);
       setSubmitted(true);
@@ -94,11 +111,11 @@ const EmailForSignup = () => {
       console.error("メール送信エラー:", error);
     }
   };
-
+  */
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button variant="link">ユーザー登録</Button>
+        <Button variant={variant}>ユーザー登録</Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-(--standard-dialog-max-width)">
         <DialogHeader>
@@ -136,7 +153,7 @@ const EmailForSignup = () => {
                             {...field}
                           />
                           <p className="flex items-center text-secondary text-sm">
-                            有効なメールアドレスを入力してください。
+                            有効なメールアドレスをご入力ください。
                             {emailValidated}
                           </p>
                         </>
@@ -153,7 +170,7 @@ const EmailForSignup = () => {
                     disabled={submitDisabled}
                     className="w-full"
                   >
-                    E メールアドレスを登録する
+                    E メールアドレスを送信する
                   </Button>
                 </SubmitFooter>
               </form>

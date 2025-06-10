@@ -2,23 +2,25 @@ import { GetServerSideProps } from "next";
 import { getDocuments } from "@/lib/firebase/getDocuments";
 import type { GetCollectionConfig } from "@/types/getDocumentsConfig";
 import ProfileModule from "@/modules/ProfileModule";
+import MainHeader from "@/components/Article/MainHeader";
+import MainContainer from "@/components/Article/MainContainer";
 
 type Props = {
-  uid: string,
-  userId: string,
-  userName: string
- };
+  uid: string;
+  userId: string;
+  userName: string;
+};
 
 const UserPage = ({ uid, userId, userName }: Props) => {
   return (
-    <main>
-      <header>
-        <h2>{`${userName}（@${userId}）のプロフィールページ`}</h2>
-      </header>
-      <ProfileModule uid={uid} readonly={true} />
-    </main>
+    <>
+      <MainHeader title={`${userName}（@${userId}）のプロフィール`}></MainHeader>
+      <MainContainer>
+        <ProfileModule uid={uid} readonly={true} />
+      </MainContainer>
+    </>
   );
-}
+};
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const _userId = context.params?.userId as string;
@@ -40,7 +42,6 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     uid: string;
   }>;
 
-
   if (resUserId.length === 0) return { notFound: true };
 
   const uid = resUserId[0].uid;
@@ -56,7 +57,8 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     value: string;
   }>;
 
-  if (resUid.length === 0 || userId !== resUid[0].value) return { notFound: true };
+  if (resUid.length === 0 || userId !== resUid[0].value)
+    return { notFound: true };
 
   const configName: GetCollectionConfig = {
     collectionName: "b_user_name",
@@ -64,7 +66,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     public_only: false,
     order_by: { field: "timestamp", direction: "desc" },
     limit_num: 1,
-  }
+  };
   const resName = (await getDocuments([configName])) as Array<{
     value: string;
   }>;
@@ -73,7 +75,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 
   const userName = resName[0].value;
 
-  return { props: {uid, userId, userName} };
+  return { props: { uid, userId, userName } };
 };
 
 export default UserPage;

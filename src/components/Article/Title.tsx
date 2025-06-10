@@ -15,7 +15,7 @@ const Title = ({ children, level }: TitleProps) => {
     ),
     "article": (
       <h3 className="font-bold text-xl">{children}</h3>
-    )     
+    )
   }
   const element = levels[level];
 

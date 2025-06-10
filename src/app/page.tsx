@@ -13,12 +13,12 @@ const Index = () => {
   if (loginLoading) return <Loading />;
 
   return (
-    <main>
+    <>
       <header>
         <h1>home</h1>
         <img src={uploadedUrl} />
       </header> 
-    </main>
+    </>
   );
 };
 

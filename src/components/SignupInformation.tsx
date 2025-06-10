@@ -12,7 +12,7 @@ const SignupInformation = () => {
       </header>
       <p>ユーザー登録して…</p>
       <footer>
-        <EmailForSignup closeDialog={closeDialog} />
+        <EmailForSignup />
       </footer>
     </article>
   );

@@ -69,7 +69,7 @@ const Page = () => {
   })();
 
   return (
-      <main>
+      <>
         <header>
           <h1>管理画面</h1>
           {loginInfo?.admin ? (
@@ -161,7 +161,7 @@ const Page = () => {
             </article>
           </>
         )}
-      </main>
+      </>
   );
 };
 

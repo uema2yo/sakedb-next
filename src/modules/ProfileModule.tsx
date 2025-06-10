@@ -11,9 +11,11 @@ import EditableFields from "@/components/Form/EditableFields";
 import { validateForms } from "@/lib/code/validateForms";
 import { formatDate, generateUniqueToken, getLabelFromCode } from "@/lib/utils";
 import { GENDER_CODES } from "@/constants";
+import { Avatar, AvatarImage } from "@/components/ui/avatar";
 import type { GetCollectionConfig } from "@/types/getDocumentsConfig";
 import type { DocumentData } from "firebase/firestore";
 import { read } from "node:fs";
+import { AvatarFallback } from "@radix-ui/react-avatar";
 
 interface Props {
   uid: string;
@@ -32,7 +34,6 @@ const altUserId = `user-${generateUniqueToken(12)}`;
 const altUserName = `ユーザー${generateUniqueToken(6)}`;
 
 const ProfileModule = (props: Props) => {
-  
   const uid = useSelector((state: RootState) => state.auth.uid) as string;
   const profileConfig: {
     [key: string]: GetCollectionConfig;
@@ -108,7 +109,7 @@ const ProfileModule = (props: Props) => {
       limit_num: 1,
     },
   };
-  
+
   const getProfileImageUrl = async () => {
     const res = await getDocuments([profileConfig.iamgeUrl]);
     console.log("image", res);
@@ -125,9 +126,9 @@ const ProfileModule = (props: Props) => {
   const [document, setDocument] = useState<
     Record<string, { public: boolean; value: string | number | boolean }>
   >({});
-  const [profileImageUrl, setProfileImageUrl] = useState(useSelector(
-    (state: RootState) => state.profileImage.url
-  ));
+  const [profileImageUrl, setProfileImageUrl] = useState(
+    useSelector((state: RootState) => state.profileImage.url)
+  );
   const field = useMemo(
     () => ({
       id: {
@@ -315,7 +316,7 @@ const ProfileModule = (props: Props) => {
     id: string,
     value: string | number | boolean,
     saveOnly: boolean,
-    options?: {limit: number}
+    options?: { limit: number }
   ) => {
     return await validateForms(id, value, saveOnly);
   };
@@ -494,7 +495,9 @@ const ProfileModule = (props: Props) => {
       elements: { namedItem: (arg0: string) => { value: string } };
     }) => {
       const value = form.elements.namedItem("introduction-value").value;
-      const valid = await validate("introduction", value, false, {limit: 200});
+      const valid = await validate("introduction", value, false, {
+        limit: 200,
+      });
       valid.result &&
         (await save2Collection("introduction", "b_user_introduction", {
           value: value,
@@ -523,8 +526,8 @@ const ProfileModule = (props: Props) => {
   };
 
   useEffect(() => {
-    if(props.readonly) {
-      (async() => {
+    if (props.readonly) {
+      (async () => {
         const url = await getProfileImageUrl();
         setProfileImageUrl(url);
       })();
@@ -567,8 +570,8 @@ const ProfileModule = (props: Props) => {
       {loading ? (
         <Loading />
       ) : (
-        <article>
-          <figure className="">
+        <>
+          <figure className="mb-8">
             {props.uid && !props.readonly ? (
               <ImageUploader
                 collectionName="b_user_profileImage"
@@ -580,297 +583,318 @@ const ProfileModule = (props: Props) => {
                 }}
               />
             ) : (
-              profileImageUrl !== "" && 
-              <>
-              <img src={profileImageUrl} alt={`${document.name.value} のプロフィール画像`} />
-              <figcaption>
-              {document.id?.value && document.name?.value && (
+              profileImageUrl !== "" && (
                 <>
-                  {document.name?.value}（@{document.id?.value}
-                  ）
+                  <figcaption className="mb-4">
+                    プロフィール画像
+                  </figcaption>
+                  <Avatar className="w-48 h-48 m-auto">
+                    <AvatarImage
+                      src={profileImageUrl}
+                      alt={`${document.name.value} のプロフィール画像`}
+                    />
+                    <AvatarFallback>
+                      <img
+                        src="/images/noimage.png"
+                        alt="プロフィール画像の代替"
+                      />
+                    </AvatarFallback>
+                  </Avatar>
                 </>
-              )}
-              </figcaption>
-              </>
+              )
             )}
           </figure>
-          <section>
-            <h3>ユーザーID</h3>
-            {props.readonly ? 
-              userProfileItem.id.public ? 
-                <>
-                {userProfileItem.id.value}
-                </>
-                :
-                <span>非公開</span>
-              :
-              <EditableFields
-                field={field.id}
-                isPublic={userProfileItem.id.public === true}
-                userLoggedIn={props.uid !== ""}
-                validate={validate}
-                defaultEditMode={document.id?.value === undefined}
-                save={handleSave.id}
-              >
-                <span>{userProfileItem.id.public ? "公開" : "非公開"}</span>
-                {userProfileItem.id.value}
-              </EditableFields>
-            }
-          </section>
-          <section>
-            <h3>ユーザー名</h3>
-            {props.readonly ? 
-              userProfileItem.name.public ? 
-                <>
-                {userProfileItem.name.value}
-                </>
-                :
-                <span>非公開</span>
-              :
-              <EditableFields
-                field={field.name}
-                isPublic={userProfileItem.name.public === true}
-                userLoggedIn={props.uid !== ""}
-                defaultEditMode={document.name?.value === undefined}
-                save={handleSave.name}
-              >
-                <span>{userProfileItem.name.public ? "公開" : "非公開"}</span>
-                {userProfileItem.name.value}
-              </EditableFields>
-            }
-          </section>
-
-          <section>
-            <h3>性別</h3>
-            {props.readonly ? 
-              userProfileItem.gender.public ? 
-                <>
-                {getLabelFromCode(
-                  GENDER_CODES,
-                  Number(userProfileItem.gender.value),
-                  "ja"
-                )}
-                </>
-                :
-                <span>非公開</span>
-              :
-              <EditableFields
-                field={field.gender}
-                isPublic={userProfileItem.gender.public === true}
-                userLoggedIn={props.uid !== ""}
-                validate={validate}
-                defaultEditMode={document.gender?.value === undefined}
-                save={handleSave.gender}
-              >
-                <span>{userProfileItem.gender.public ? "公開" : "非公開"}</span>
-                {getLabelFromCode(
-                  GENDER_CODES,
-                  Number(userProfileItem.gender.value),
-                  "ja"
-                )}
-              </EditableFields>
-            }
-          </section>
-          <section>
-            <h3>生年月日</h3>
-            {props.readonly ? 
-              userProfileItem.birthdate.public ? 
-                <>
-                {formatDate(userProfileItem.birthdate.value as string, "ja")}
-                </>
-                :
-                <span>非公開</span>
-              :
-              <EditableFields
-                field={field.birthdate}
-                isPublic={userProfileItem.birthdate.public === true}
-                userLoggedIn={props.uid !== ""}
-                validate={validate}
-                defaultEditMode={document.birthdate?.value === undefined}
-                save={handleSave.birthdate}
-              >
-                <span>
-                  {userProfileItem.birthdate.public ? "公開" : "非公開"}
-                </span>
-                {formatDate(userProfileItem.birthdate.value as string, "ja")}
-              </EditableFields>
-            }
-          </section>
-          <section>
-            <h3>在住地域</h3>
-            {props.readonly ? 
-              userProfileItem.residenceRegion.public ? 
-                <>
-                {subregions &&
-                  getLabelFromCode(
-                    subregions,
-                    userProfileItem.residenceRegion.value as string,
+          <dl className="grid grid-cols-3 gap-4">
+            <dt>ユーザーID</dt>
+            <dd className="col-span-2">
+              {props.readonly ? (
+                userProfileItem.id.public ? (
+                  <span>{userProfileItem.id.value}</span>
+                ) : (
+                  <span>非公開</span>
+                )
+              ) : (
+                <EditableFields
+                  field={field.id}
+                  isPublic={userProfileItem.id.public === true}
+                  userLoggedIn={props.uid !== ""}
+                  validate={validate}
+                  defaultEditMode={document.id?.value === undefined}
+                  save={handleSave.id}
+                >
+                  <span>{userProfileItem.id.public ? "公開" : "非公開"}</span>
+                  {userProfileItem.id.value}
+                </EditableFields>
+              )}
+            </dd>
+            <dt>ユーザー名</dt>
+            <dd className="col-span-2">
+              {props.readonly ? (
+                userProfileItem.name.public ? (
+                  <>{userProfileItem.name.value}</>
+                ) : (
+                  <span>非公開</span>
+                )
+              ) : (
+                <EditableFields
+                  field={field.name}
+                  isPublic={userProfileItem.name.public === true}
+                  userLoggedIn={props.uid !== ""}
+                  defaultEditMode={document.name?.value === undefined}
+                  save={handleSave.name}
+                >
+                  <span>{userProfileItem.name.public ? "公開" : "非公開"}</span>
+                  {userProfileItem.name.value}
+                </EditableFields>
+              )}
+            </dd>
+            <dt>性別</dt>
+            <dd className="col-span-2">
+              {props.readonly ? (
+                userProfileItem.gender.public ? (
+                  <>
+                    {getLabelFromCode(
+                      GENDER_CODES,
+                      Number(userProfileItem.gender.value),
+                      "ja"
+                    )}
+                  </>
+                ) : (
+                  <span>非公開</span>
+                )
+              ) : (
+                <EditableFields
+                  field={field.gender}
+                  isPublic={userProfileItem.gender.public === true}
+                  userLoggedIn={props.uid !== ""}
+                  validate={validate}
+                  defaultEditMode={document.gender?.value === undefined}
+                  save={handleSave.gender}
+                >
+                  <span>
+                    {userProfileItem.gender.public ? "公開" : "非公開"}
+                  </span>
+                  {getLabelFromCode(
+                    GENDER_CODES,
+                    Number(userProfileItem.gender.value),
                     "ja"
                   )}
-                </>
-                :
-                <span>非公開</span>
-              :
-              <EditableFields
-                field={field.residenceRegion}
-                isPublic={userProfileItem.residenceRegion.public === true}
-                userLoggedIn={props.uid !== ""}
-                validate={validate}
-                defaultEditMode={document.residenceRegion?.value === undefined}
-                save={handleSave.residenceRegion}
-                default="00"
-              >
-                <span>
-                  {userProfileItem.residenceRegion.public ? "公開" : "非公開"}
-                </span>
-                {subregions &&
-                  getLabelFromCode(
-                    subregions,
-                    userProfileItem.residenceRegion.value as string,
-                    "ja"
-                  )}
-              </EditableFields>
-            }
-          </section>
-          <section>
-            <h3>在住国</h3>
-            {props.readonly ? 
-              userProfileItem.residenceCountry.public ? 
-                <>
-                {countries &&
-                  getLabelFromCode(
-                    countries,
-                    userProfileItem.residenceCountry.value as string,
-                    "ja"
-                  )}
-                </>
-                :
-                <span>非公開</span>
-              :
-              <EditableFields
-                field={field.residenceCountry}
-                isPublic={userProfileItem.residenceCountry.public === true}
-                userLoggedIn={props.uid !== ""}
-                validate={validate}
-                defaultEditMode={document.residenceCountry?.value === undefined}
-                save={handleSave.residenceCountry}
-                default="00"
-              >
-                <span>
-                  {userProfileItem.residenceCountry.public ? "公開" : "非公開"}
-                </span>
-                {countries &&
-                  getLabelFromCode(
-                    countries,
-                    userProfileItem.residenceCountry.value as string,
-                    "ja"
-                  )}
-              </EditableFields>
-            }
-          </section>
-          <section>
-            <h3>在住都道府県</h3>
-            {props.readonly ? 
-              userProfileItem.residencePrefecture.public ? 
-                <>
-                {prefectures &&
-                  getLabelFromCode(
-                    prefectures,
-                    Number(userProfileItem.residencePrefecture.value),
-                    "ja"
-                  )}
-                </>
-                :
-                <span>非公開</span>
-              :
-              <EditableFields
-                field={field.residencePrefecture}
-                isPublic={userProfileItem.residencePrefecture.public === true}
-                userLoggedIn={props.uid !== ""}
-                validate={validate}
-                defaultEditMode={
-                  document.residencePrefecture?.value === undefined
-                }
-                save={handleSave.residencePrefecture}
-                default="00"
-              >
-                <span>
-                  {userProfileItem.residencePrefecture.public
-                    ? "公開"
-                    : "非公開"}
-                </span>
-                {prefectures &&
-                  getLabelFromCode(
-                    prefectures,
-                    Number(userProfileItem.residencePrefecture.value),
-                    "ja"
-                  )}
-              </EditableFields>
-            }
-          </section>
-          <section>
-            <h3>在住市区町村</h3>
-            {props.readonly ? 
-              userProfileItem.residenceCity.public ? 
-                <>
-                {cities &&
-                  getLabelFromCode(
-                    cities,
-                    Number(userProfileItem.residenceCity.value),
-                    "ja"
-                  )}
-                </>
-                :
-                <span>非公開</span>
-              :
-              <EditableFields
-                field={field.residenceCity}
-                isPublic={userProfileItem.residenceCity.public === true}
-                userLoggedIn={props.uid !== ""}
-                validate={validate}
-                defaultEditMode={document.residenceCity?.value === undefined}
-                save={handleSave.residenceCity}
-                default="00"
-              >
-                <span>
-                  {userProfileItem.residenceCity.public ? "公開" : "非公開"}
-                </span>
-                {cities &&
-                  getLabelFromCode(
-                    cities,
-                    Number(userProfileItem.residenceCity.value),
-                    "ja"
-                  )}
-              </EditableFields>
-            }
-          </section>
-          <section>
-            <h3>自己紹介</h3>
-            {props.readonly ? 
-              userProfileItem.introduction.public ? 
-                <>
-                {userProfileItem.introduction.value}
-                </>
-                :
-                <span>非公開</span>
-              :
-              <EditableFields
-                field={field.introduction}
-                isPublic={userProfileItem.introduction.public === true}
-                userLoggedIn={props.uid !== ""}
-                validate={validate}
-                defaultEditMode={document.introduction?.value === undefined}
-                save={handleSave.introduction}
-              >
-                <span>
-                  {userProfileItem.introduction.public ? "公開" : "非公開"}
-                </span>
-                {userProfileItem.introduction.value}
-              </EditableFields>
-              
-            }
-          </section>
-        </article>
+                </EditableFields>
+              )}
+            </dd>
+            <dt>生年月日</dt>
+            <dd className="col-span-2">
+              {props.readonly ? (
+                userProfileItem.birthdate.public ? (
+                  <>
+                    {formatDate(
+                      userProfileItem.birthdate.value as string,
+                      "ja"
+                    )}
+                  </>
+                ) : (
+                  <span>非公開</span>
+                )
+              ) : (
+                <EditableFields
+                  field={field.birthdate}
+                  isPublic={userProfileItem.birthdate.public === true}
+                  userLoggedIn={props.uid !== ""}
+                  validate={validate}
+                  defaultEditMode={document.birthdate?.value === undefined}
+                  save={handleSave.birthdate}
+                >
+                  <span>
+                    {userProfileItem.birthdate.public ? "公開" : "非公開"}
+                  </span>
+                  {formatDate(userProfileItem.birthdate.value as string, "ja")}
+                </EditableFields>
+              )}
+            </dd>
+            <dt>在住地域</dt>
+            <dd className="col-span-2">
+              {props.readonly ? (
+                userProfileItem.residenceRegion.public ? (
+                  <>
+                    {subregions &&
+                      getLabelFromCode(
+                        subregions,
+                        userProfileItem.residenceRegion.value as string,
+                        "ja"
+                      )}
+                  </>
+                ) : (
+                  <span>非公開</span>
+                )
+              ) : (
+                <EditableFields
+                  field={field.residenceRegion}
+                  isPublic={userProfileItem.residenceRegion.public === true}
+                  userLoggedIn={props.uid !== ""}
+                  validate={validate}
+                  defaultEditMode={
+                    document.residenceRegion?.value === undefined
+                  }
+                  save={handleSave.residenceRegion}
+                  default="00"
+                >
+                  <span>
+                    {userProfileItem.residenceRegion.public ? "公開" : "非公開"}
+                  </span>
+                  {subregions &&
+                    getLabelFromCode(
+                      subregions,
+                      userProfileItem.residenceRegion.value as string,
+                      "ja"
+                    )}
+                </EditableFields>
+              )}
+            </dd>
+            <dt>在住国</dt>
+            <dd className="col-span-2">
+              {props.readonly ? (
+                userProfileItem.residenceCountry.public ? (
+                  <>
+                    {countries &&
+                      getLabelFromCode(
+                        countries,
+                        userProfileItem.residenceCountry.value as string,
+                        "ja"
+                      )}
+                  </>
+                ) : (
+                  <span>非公開</span>
+                )
+              ) : (
+                <EditableFields
+                  field={field.residenceCountry}
+                  isPublic={userProfileItem.residenceCountry.public === true}
+                  userLoggedIn={props.uid !== ""}
+                  validate={validate}
+                  defaultEditMode={
+                    document.residenceCountry?.value === undefined
+                  }
+                  save={handleSave.residenceCountry}
+                  default="00"
+                >
+                  <span>
+                    {userProfileItem.residenceCountry.public
+                      ? "公開"
+                      : "非公開"}
+                  </span>
+                  {countries &&
+                    getLabelFromCode(
+                      countries,
+                      userProfileItem.residenceCountry.value as string,
+                      "ja"
+                    )}
+                </EditableFields>
+              )}
+            </dd>
+            <dt>在住都道府県</dt>
+            <dd className="col-span-2">
+              {props.readonly ? (
+                userProfileItem.residencePrefecture.public ? (
+                  <>
+                    {prefectures &&
+                      getLabelFromCode(
+                        prefectures,
+                        Number(userProfileItem.residencePrefecture.value),
+                        "ja"
+                      )}
+                  </>
+                ) : (
+                  <span>非公開</span>
+                )
+              ) : (
+                <EditableFields
+                  field={field.residencePrefecture}
+                  isPublic={userProfileItem.residencePrefecture.public === true}
+                  userLoggedIn={props.uid !== ""}
+                  validate={validate}
+                  defaultEditMode={
+                    document.residencePrefecture?.value === undefined
+                  }
+                  save={handleSave.residencePrefecture}
+                  default="00"
+                >
+                  <span>
+                    {userProfileItem.residencePrefecture.public
+                      ? "公開"
+                      : "非公開"}
+                  </span>
+                  {prefectures &&
+                    getLabelFromCode(
+                      prefectures,
+                      Number(userProfileItem.residencePrefecture.value),
+                      "ja"
+                    )}
+                </EditableFields>
+              )}
+            </dd>
+            <dt>在住市区町村</dt>
+            <dd className="col-span-2">
+              {props.readonly ? (
+                userProfileItem.residenceCity.public ? (
+                  <>
+                    {cities &&
+                      getLabelFromCode(
+                        cities,
+                        Number(userProfileItem.residenceCity.value),
+                        "ja"
+                      )}
+                  </>
+                ) : (
+                  <span>非公開</span>
+                )
+              ) : (
+                <EditableFields
+                  field={field.residenceCity}
+                  isPublic={userProfileItem.residenceCity.public === true}
+                  userLoggedIn={props.uid !== ""}
+                  validate={validate}
+                  defaultEditMode={document.residenceCity?.value === undefined}
+                  save={handleSave.residenceCity}
+                  default="00"
+                >
+                  <span>
+                    {userProfileItem.residenceCity.public ? "公開" : "非公開"}
+                  </span>
+                  {cities &&
+                    getLabelFromCode(
+                      cities,
+                      Number(userProfileItem.residenceCity.value),
+                      "ja"
+                    )}
+                </EditableFields>
+              )}
+            </dd>
+            <dt>自己紹介</dt>
+            <dd className="col-span-2">
+              {props.readonly ? (
+                userProfileItem.introduction.public ? (
+                  <>{userProfileItem.introduction.value}</>
+                ) : (
+                  <span>非公開</span>
+                )
+              ) : (
+                <EditableFields
+                  field={field.introduction}
+                  isPublic={userProfileItem.introduction.public === true}
+                  userLoggedIn={props.uid !== ""}
+                  validate={validate}
+                  defaultEditMode={document.introduction?.value === undefined}
+                  save={handleSave.introduction}
+                >
+                  <span>
+                    {userProfileItem.introduction.public ? "公開" : "非公開"}
+                  </span>
+                  {userProfileItem.introduction.value}
+                </EditableFields>
+              )}
+            </dd>
+          </dl>
+        </>
       )}
     </>
   );
