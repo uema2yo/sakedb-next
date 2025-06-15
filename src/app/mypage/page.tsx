@@ -1,5 +1,7 @@
 "use client";
 
+import MainContainer from "@/components/Article/MainContainer";
+import MainHeader from "@/components/Article/MainHeader";
 import Title from "@/components/Article/Title";
 import Loading from "@/components/Loading";
 import SignupInformation from "@/components/SignupInformation";
@@ -15,17 +17,17 @@ const Mypage = () => {
   
   if (loginLoading) return <Loading />;
 
-  return(
-      <>
-        <header>
-            <Title level="main">マイページ</Title>
-        </header>
-        { uid ?
-        <ProfileModule uid={uid} readonly={false} />
-        :
-        <SignupInformation />
-        }
-      </>
+  return (
+    <>
+      <MainHeader title="マイページ"></MainHeader>
+      <MainContainer className="max-w-3xl">
+        {uid ? (
+          <ProfileModule uid={uid} readonly={false} />
+        ) : (
+          <SignupInformation />
+        )}
+      </MainContainer>
+    </>
   );
 }
 

@@ -130,17 +130,21 @@ const ProfileModule = (props: Props) => {
     useSelector((state: RootState) => state.profileImage.url)
   );
   const field = useMemo(
-    () => ({
+    () => (
+      console.log("subregions", subregions, countries, prefectures, cities),
+      {
       id: {
         id: "id",
         fields: [
           {
             name: "public",
-            type: "checkbox",
+            type: "switch",
             checked: userProfileItem.id?.public as boolean,
+            value: userProfileItem.id?.public as boolean,
             disabled: true,
+            label: {on: "公開", off: "非公開"},
           },
-          { name: "value", type: "text", value: userProfileItem.id?.value },
+          { name: "value", type: "text", value: userProfileItem.id?.value, label: "ユーザーID" },
         ],
       },
       name: {
@@ -148,11 +152,13 @@ const ProfileModule = (props: Props) => {
         fields: [
           {
             name: "public",
-            type: "checkbox",
+            type: "switch",
             checked: userProfileItem.name?.public,
+            value: userProfileItem.name?.public as boolean,
             disabled: true,
+            label: {on: "公開", off: "非公開"},
           },
-          { name: "value", type: "text", value: userProfileItem.name?.value },
+          { name: "value", type: "text", value: userProfileItem.name?.value, label: "ユーザー名" },
         ],
       },
       gender: {
@@ -160,15 +166,18 @@ const ProfileModule = (props: Props) => {
         fields: [
           {
             name: "public",
-            type: "checkbox",
+            type: "switch",
             checked: userProfileItem.gender?.public,
+            value: userProfileItem.gender?.public ?? false,
             disabled: false,
+            label: {on: "公開", off: "非公開"},
           },
           {
             name: "value",
             type: "select",
             value: userProfileItem.gender?.value,
             options: GENDER_CODES,
+            label: "性別",
           },
         ],
       },
@@ -177,14 +186,17 @@ const ProfileModule = (props: Props) => {
         fields: [
           {
             name: "public",
-            type: "checkbox",
+            type: "switch",
             checked: userProfileItem.birthdate?.public,
+            value: userProfileItem.birthdate?.public,
             disabled: false,
+            label: {on: "公開", off: "非公開"},
           },
           {
             name: "value",
             type: "date",
             value: userProfileItem.birthdate?.value,
+            label: "生年月日",
           },
         ],
       },
@@ -193,15 +205,18 @@ const ProfileModule = (props: Props) => {
         fields: [
           {
             name: "public",
-            type: "checkbox",
+            type: "switch",
             checked: userProfileItem.residenceRegion?.public,
+            value: userProfileItem.residenceRegion?.public ?? false,
             disabled: false,
+            label: {on: "公開", off: "非公開"},
           },
           {
             name: "value",
             type: "select",
             value: userProfileItem.residenceRegion?.value,
             options: subregions,
+            label: "在住地域",
           },
         ],
       },
@@ -210,15 +225,23 @@ const ProfileModule = (props: Props) => {
         fields: [
           {
             name: "public",
-            type: "checkbox",
-            checked: userProfileItem.residenceCountry?.public,
+            type: "switch",
+            checked: userProfileItem.residenceCountry?.public ?? false,
+            value: userProfileItem.residenceCountry?.public ?? false,
             disabled: false,
+            label: {on: "公開", off: "非公開"},
           },
           {
             name: "value",
             type: "select",
-            value: userProfileItem.residenceCountry?.value,
-            options: countries,
+            value: userProfileItem.residenceCountry?.value ?? "",
+            options: Array.isArray(countries)
+              ? countries.map((item) => ({
+                  code: item.code,
+                  label: item.label,
+                }))
+              : [],
+            label: "在住国",
           },
         ],
       },
@@ -227,15 +250,23 @@ const ProfileModule = (props: Props) => {
         fields: [
           {
             name: "public",
-            type: "checkbox",
+            type: "switch",
             checked: userProfileItem.residencePrefecture?.public,
+            value: userProfileItem.residencePrefecture?.public ?? false,
             disabled: false,
+            label: {on: "公開", off: "非公開"},
           },
           {
             name: "value",
             type: "select",
             value: userProfileItem.residencePrefecture?.value,
-            options: prefectures,
+            options: Array.isArray(prefectures)
+              ? prefectures.map((item) => ({
+                  code: item.code,
+                  label: item.label,
+                }))
+              : [],
+            label: "在住都道府県",
           },
         ],
       },
@@ -244,15 +275,23 @@ const ProfileModule = (props: Props) => {
         fields: [
           {
             name: "public",
-            type: "checkbox",
+            type: "switch",
             checked: userProfileItem.residenceCity?.public,
+            value: userProfileItem.residenceCity?.public ?? false,
             disabled: false,
+            label: {on: "公開", off: "非公開"},
           },
           {
             name: "value",
             type: "select",
             value: userProfileItem.residenceCity?.value,
-            options: cities,
+            options: Array.isArray(cities)
+              ? cities.map((item) => ({
+                  code: item.code,
+                  label: item.label,
+                }))
+              : [],
+            label: "在住市区町村",
           },
         ],
       },
@@ -261,20 +300,23 @@ const ProfileModule = (props: Props) => {
         fields: [
           {
             name: "public",
-            type: "checkbox",
+            type: "switch",
             checked: userProfileItem.introduction?.public as boolean,
+            value: userProfileItem.introduction?.public ?? false,
             disabled: true,
+            label: {on: "公開", off: "非公開"},
           },
           {
             name: "value",
             type: "textarea",
             value: userProfileItem.introduction?.value ?? "",
             limit: 200,
+            label: "自己紹介",
           },
         ],
       },
     }),
-    [userProfileItem]
+    [userProfileItem, subregions, countries, prefectures, cities]
   );
 
   const getCurrentUserProfile = (
@@ -378,10 +420,8 @@ const ProfileModule = (props: Props) => {
   };
 
   const handleSave = {
-    id: async (form: {
-      elements: { namedItem: (arg0: string) => { value: string } };
-    }) => {
-      const value = form.elements.namedItem("id-value").value;
+    id: async (data: any) => {
+      const value = data["id-value"] || data.value;
       const valid = await validate("id", value, false);
       valid.result &&
         (await save2Collection("id", "b_user_id", {
@@ -390,10 +430,8 @@ const ProfileModule = (props: Props) => {
         }));
       return valid;
     },
-    name: async (form: {
-      elements: { namedItem: (arg0: string) => { value: string } };
-    }) => {
-      const value = form.elements.namedItem("name-value").value;
+    name: async (data: any) => {
+      const value = data["name-value"] || data.value;
       const valid = await validate("name", value, false);
       valid.result &&
         (await save2Collection("name", "b_user_name", {
@@ -402,26 +440,19 @@ const ProfileModule = (props: Props) => {
         }));
       return valid;
     },
-    gender: async (form: {
-      elements: {
-        namedItem: (arg0: string) => { value: string; checked: boolean };
-      };
-    }) => {
-      const value = form.elements.namedItem("gender-value").value;
-      const publicChecked = form.elements.namedItem("gender-public").checked;
+    gender: async (data: any) => {
+      const value = data["gender-value"] || data.value;
+      const publicChecked = data["gender-public"] || data.public;
       await save2Collection("gender", "b_user_gender", {
         value: value,
         public: publicChecked,
       });
       return { result: true };
     },
-    birthdate: async (form: {
-      elements: {
-        namedItem: (arg0: string) => { value: string; checked: boolean };
-      };
-    }) => {
-      const value = form.elements.namedItem("birthdate-value").value;
-      const publicChecked = form.elements.namedItem("birthdate-public").checked;
+    birthdate: async (data: any) => {
+      const value = data["birthdate-value"] || data.value;
+      console.log("birthdate", data, value);
+      const publicChecked = data["birthdate-public"] || data.public;
       const valid = await validate("birthdate", value, false);
       valid.result &&
         (await save2Collection("birthdate", "b_user_birthdate", {
@@ -430,45 +461,27 @@ const ProfileModule = (props: Props) => {
         }));
       return valid;
     },
-    residenceRegion: async (form: {
-      elements: {
-        namedItem: (arg0: string) => { value: string; checked: boolean };
-      };
-    }) => {
-      const value = form.elements.namedItem("residenceRegion-value").value;
-      const publicChecked = form.elements.namedItem(
-        "residenceRegion-public"
-      ).checked;
+    residenceRegion: async (data: any) => {
+      const value = data["residenceRegion-value"] || data.value;
+      const publicChecked = data["residenceRegion-public"] || data.public;
       await save2Collection("residenceRegion", "b_user_residenceRegion", {
         value: value,
         public: publicChecked,
       });
       return { result: true };
     },
-    residenceCountry: async (form: {
-      elements: {
-        namedItem: (arg0: string) => { value: string; checked: boolean };
-      };
-    }) => {
-      const value = form.elements.namedItem("residenceCountry-value").value;
-      const publicChecked = form.elements.namedItem(
-        "residenceCountry-public"
-      ).checked;
+    residenceCountry: async (data: any) => {
+      const value = data["residenceCountry-value"] || data.value;
+      const publicChecked = data["residenceCountry-public"] || data.public;
       await save2Collection("residenceCountry", "b_user_residenceCountry", {
         value: value,
         public: publicChecked,
       });
       return { result: true };
     },
-    residencePrefecture: async (form: {
-      elements: {
-        namedItem: (arg0: string) => { value: string; checked: boolean };
-      };
-    }) => {
-      const value = form.elements.namedItem("residencePrefecture-value").value;
-      const publicChecked = form.elements.namedItem(
-        "residencePrefecture-public"
-      ).checked;
+    residencePrefecture: async (data: any) => {
+      const value = data["residencePrefecture-value"] || data.value;
+      const publicChecked = data["residencePrefecture-public"] || data.public;
       await save2Collection(
         "residencePrefecture",
         "b_user_residencePrefecture",
@@ -476,25 +489,17 @@ const ProfileModule = (props: Props) => {
       );
       return { result: true };
     },
-    residenceCity: async (form: {
-      elements: {
-        namedItem: (arg0: string) => { value: string; checked: boolean };
-      };
-    }) => {
-      const value = form.elements.namedItem("residenceCity-value").value;
-      const publicChecked = form.elements.namedItem(
-        "residenceCity-public"
-      ).checked;
+    residenceCity: async (data: any) => {
+      const value = data["residenceCity-value"] || data.value;
+      const publicChecked = data.residenceCityPublic || data.public;
       await save2Collection("residenceCity", "b_user_residenceCity", {
         value: value,
         public: publicChecked,
       });
       return { result: true };
     },
-    introduction: async (form: {
-      elements: { namedItem: (arg0: string) => { value: string } };
-    }) => {
-      const value = form.elements.namedItem("introduction-value").value;
+    introduction: async (data: any) => {
+      const value = data["introduction-value"] || data.value;
       const valid = await validate("introduction", value, false, {
         limit: 200,
       });
@@ -558,6 +563,7 @@ const ProfileModule = (props: Props) => {
   }, [document]);
 
   useEffect(() => {
+    console.log("document.residenceRegion", document.residenceRegion);
     setSelectOptionItems.country();
   }, [document.residenceRegion]);
 
@@ -585,9 +591,7 @@ const ProfileModule = (props: Props) => {
             ) : (
               profileImageUrl !== "" && (
                 <>
-                  <figcaption className="mb-4">
-                    プロフィール画像
-                  </figcaption>
+                  <figcaption className="mb-4">プロフィール画像</figcaption>
                   <Avatar className="w-48 h-48 m-auto">
                     <AvatarImage
                       src={profileImageUrl}
@@ -604,7 +608,7 @@ const ProfileModule = (props: Props) => {
               )
             )}
           </figure>
-          <dl className="grid grid-cols-3 gap-4">
+          <dl className="dl-profile grid grid-cols-3 gap-4">
             <dt>ユーザーID</dt>
             <dd className="col-span-2">
               {props.readonly ? (
@@ -687,10 +691,13 @@ const ProfileModule = (props: Props) => {
               {props.readonly ? (
                 userProfileItem.birthdate.public ? (
                   <>
-                    {formatDate(
-                      userProfileItem.birthdate.value as string,
-                      "ja"
-                    )}
+                    {userProfileItem.birthdate.value
+                      ? formatDate(
+                          userProfileItem.birthdate.value as string,
+                          "ja"
+                        )
+                      : "----年--月--日"}
+                    {userProfileItem.birthdate.value as string}
                   </>
                 ) : (
                   <span>非公開</span>
@@ -707,7 +714,12 @@ const ProfileModule = (props: Props) => {
                   <span>
                     {userProfileItem.birthdate.public ? "公開" : "非公開"}
                   </span>
-                  {formatDate(userProfileItem.birthdate.value as string, "ja")}
+                  {userProfileItem.birthdate.value
+                    ? formatDate(
+                        userProfileItem.birthdate.value as string,
+                        "ja"
+                      )
+                    : "----年--月--日"}
                 </EditableFields>
               )}
             </dd>

@@ -2,6 +2,22 @@
 
 import { countChars } from "@/lib/utils";
 import React, { useState, useEffect, useRef } from "react";
+import { Button } from "../ui/button";
+import {
+  Form,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormControl,
+  FormMessage,
+} from "@/components/ui/form";
+import { useForm } from "react-hook-form";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Switch } from "@/components/ui/switch";
+import { SquarePen } from "lucide-react";
 
 interface Props {
   field: {
@@ -9,15 +25,36 @@ interface Props {
     fields: (
       | {
           name: string;
-          type: string;
+          type: "checkbox";
           checked: boolean;
           disabled: boolean;
+          label: string;
+        }
+      | {
+          name: string;
+          type: "switch";
+          checked: boolean;
+          disabled: boolean;
+          label?: {on: string, off: string};
+        }
+
+        | {
+          name: string;
+          type: "select";
+          value: string | number | boolean;
+          options: {
+            code: string | number | readonly string[] | undefined;
+            label: Record<string, string>;
+          }[];
+          label?: string;
         }
       | {
           name: string;
           type: string;
           value: string | number | boolean;
           limit?: number;
+          label?: string;
+          disabled?: boolean;
         }
     )[];
   };
@@ -46,7 +83,10 @@ const EditableFields = (props: Props) => {
   const targetField = field.fields.find((f) => f.name === "value");
   const targetValue =
     targetField && "value" in targetField ? targetField.value : undefined;
-  const limit = targetField && "value" in targetField ? `${targetField.limit} 文字` : "";
+  const limit =
+    targetField && "limit" in targetField && typeof targetField.limit !== "undefined"
+      ? `${targetField.limit} 文字`
+      : "";
 
   const [isEditing, setIsEditing] = useState(false);
   const [editedFields, setEditedFields] = useState(() =>
@@ -58,6 +98,7 @@ const EditableFields = (props: Props) => {
   );
   const [textareaCounter, setTextareaCounter] = useState(0);
   const [loading, setLoading] = useState(false);
+  const [switchLabel, setSwitchLabel] = useState("");
 
   const inputElements = useRef(new Array(field.fields.length));
   const selectElements = useRef(new Array(field.fields.length));
@@ -96,6 +137,8 @@ const EditableFields = (props: Props) => {
       ...newFields[i],
       checked: checked,
     };
+    
+    setSwitchLabel(checked ? newFields[i].label?.on : newFields[i].label?.off);
 
     setEditedFields(newFields);
     setSubmitDisabled(false);
@@ -164,14 +207,13 @@ const EditableFields = (props: Props) => {
 
   };
 
-  const handleSave = async (event: React.FormEvent<HTMLFormElement>) => {
+  const handleSave = async (data: any) => {
     setLoading(true);
-    const form = event.target as HTMLFormElement;
-    const save = await props.save(form);
-    if (save.result) {
+    const saveResult = await props.save(data);
+    if (saveResult.result) {
       setIsEditing(false);
     } else {
-      setErrorMessage(save.message);
+      setErrorMessage(saveResult.message);
     }
     setLoading(false);
   };
@@ -191,9 +233,11 @@ const EditableFields = (props: Props) => {
   useEffect(() => {
     if (isEditing) {
       setEditedFields(JSON.parse(JSON.stringify(field.fields)));
-      setTextareaCounter(countChars(targetValue as string));
+      setTextareaCounter(countChars(String(targetValue ?? "")));
     }
   }, [isEditing, field.fields]);
+
+  const form = useForm();
 
   return (
     <>
@@ -202,13 +246,161 @@ const EditableFields = (props: Props) => {
       )
       :
       isEditing && props.userLoggedIn ? (
+        <Form {...form}>
         <form
-          onSubmit={(event) => {
-            event.preventDefault();
-            handleSave(event);
-          }}
+         onSubmit={form.handleSubmit(handleSave)}
         >
-          {editedFields?.map(
+    {editedFields?.map((fieldData: (typeof field.fields)[number], i: number) => {
+      const fieldName = `${field.id}-${fieldData.name}`;
+
+      return (
+        <FormField
+          key={i}
+          control={form.control}
+          name={fieldName}
+          render={({ field }) => {
+            switch (fieldData.type) {
+              case "select":
+                return (
+                  <FormItem>
+                    <Select
+                      value={field.value ? String(field.value) : undefined}
+                      onValueChange={(value) => {
+                        field.onChange(value);
+                        handleChangeSelect(
+                          i as number,
+                          {
+                            target: { value } as HTMLSelectElement,
+                          } as React.ChangeEvent<HTMLSelectElement>
+                        );
+                      }}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="選択してください" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {"options" in fieldData &&
+                          fieldData.options?.map((opt, j) => (
+                            <SelectItem key={j} value={String(opt.code)}>
+                              {opt.label.ja}
+                            </SelectItem>
+                          ))}
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                );
+              case "checkbox":
+                return (
+                  <FormItem className="flex items-center space-x-2">
+                    <FormControl>
+                      <Checkbox
+                        //checked={"value" in fieldData ? (fieldData.value as boolean) : false}
+                        id={fieldName}
+                        onCheckedChange={(checked) => {
+                          field.onChange(checked);
+                          handleChangeCheckbox(
+                            i as number,
+                            {
+                              target: { checked } as HTMLInputElement
+                            } as React.ChangeEvent<HTMLInputElement>
+                          );
+                        }}
+                        name={fieldName}
+                        checked={field.value as boolean}
+                        defaultChecked={fieldData.type === "checkbox" && "checked" in fieldData ? fieldData.checked : false}
+                        disabled={"disabled" in fieldData ? fieldData.disabled : false}
+                      />
+                    </FormControl>
+                    <FormLabel htmlFor={fieldName}>{fieldData.label}</FormLabel>
+                    <FormMessage />
+                  </FormItem>
+                );
+              case "switch":
+                setSwitchLabel(
+                  typeof fieldData.label === "object" && fieldData.label !== null
+                    ? (field.value as boolean ? fieldData.label.on : fieldData.label.off)
+                    : ""
+                );
+                return (
+                  <FormItem className="flex items-center space-x-2">
+                    <FormControl>
+                      <Switch
+                        id={fieldName}
+                        onCheckedChange={(checked) => {
+                          field.onChange(checked);
+                          handleChangeCheckbox(
+                            i as number,
+                            {
+                              target: { checked } as HTMLInputElement
+                            } as React.ChangeEvent<HTMLInputElement>
+                          );
+                        }}
+                        name={fieldName}
+                        checked={!!field.value as boolean}
+                      />
+                    </FormControl>
+                    <FormLabel htmlFor={fieldName}>{switchLabel}</FormLabel>
+                    <FormMessage />
+                  </FormItem>
+                );
+              case "date":
+                return (
+                  <FormItem>
+                    <FormControl>
+                      <Input
+                        type="date"
+                        value={"value" in fieldData ? (fieldData.value as string) : ""}
+                        onChange={(e) => {
+                          field.onChange(e);
+                          handleChangeText(i as number, e);
+                        }}
+                        className="w-fit"
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                );
+              case "textarea":
+                return (
+                  <FormItem>
+                    <FormControl>
+                      <Textarea
+                        value={"value" in fieldData ? (fieldData.value as string) : ""}
+                        onChange={(e) => {
+                          field.onChange(e);
+                          handleChangeTextarea(i as number, e);
+                        }}
+                        className="w-[400px] h-[200px]"
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                );
+              default:
+                return (
+                  <FormItem>
+                    <FormControl>
+                      <Input
+                        type="text"
+                        value={"value" in fieldData ? (fieldData.value as string) : ""}
+                        onChange={(e) => {
+                          field.onChange(e);
+                          handleChangeText(i as number, e);
+                        }}
+                        className="w-fit"
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                );
+            }
+          }}
+        />
+      );
+    })}
+
+          {/* editedFields?.map(
             (
               fieldData: {
                 name: string;
@@ -388,22 +580,23 @@ const EditableFields = (props: Props) => {
                   break;
               }
             }
-          )}
-          <button type="submit" disabled={submitDisabled}>
-            Save
-          </button>
+          )*/}
+          <Button type="submit" variant="primary" size="sm" disabled={submitDisabled}>
+            保存
+          </Button>
           {!props.defaultEditMode && (
-            <button type="button" onClick={cancelEdit}>
-              Cancel
-            </button>
+            <Button type="button" variant="cancel" size="sm" onClick={cancelEdit}>
+              取消
+            </Button>
           )}
         </form>
+        </Form>
       ) 
       : userLoggedIn ? (
         // Button to start editing
         <>
           {props.children}
-          <button onClick={startEditing}>Edit</button>
+          <Button variant="icon" onClick={startEditing}><SquarePen /></Button>
         </>
       )
       : null}

@@ -1,15 +1,18 @@
-import { ReactNode } from "react";
+import React, { ReactNode } from "react";
 
-interface MainContainerProps {
+type MainContainerProps = React.HTMLAttributes<HTMLDivElement> & {
+  ref?: React.Ref<HTMLDivElement>;
   children: ReactNode;
-  maxWidth?: string;
+  className?: string;
 }
 
-const MainContainer = ({ children, maxWidth }: MainContainerProps) => {
+const MainContainer = React.forwardRef<HTMLDivElement, MainContainerProps>(({ children, className, ...props }, ref) => {
   return (
-    <div className={`mb-4 bg-white ${maxWidth ? `max-w-${maxWidth}` : `max-w-full`} mx-auto`}>
+    <div ref={ref} className={`mb-4 bg-white ${className ?? ""}`} {...props}>
       {children}
     </div>
   );
-}
+});
+MainContainer.displayName = "MainContainer";
+
 export default MainContainer;

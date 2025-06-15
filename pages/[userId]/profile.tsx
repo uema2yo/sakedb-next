@@ -15,7 +15,7 @@ const UserPage = ({ uid, userId, userName }: Props) => {
   return (
     <>
       <MainHeader title={`${userName}（@${userId}）のプロフィール`}></MainHeader>
-      <MainContainer>
+      <MainContainer className="max-w-3xl">
         <ProfileModule uid={uid} readonly={true} />
       </MainContainer>
     </>

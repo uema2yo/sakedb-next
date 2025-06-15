@@ -62,6 +62,9 @@ export async function loadArrayFromJSON(url: string) {
 }
 
 export function countChars(str: string): number {
+  if (typeof str !== "string") {
+    throw new TypeError("countChars expects a string");
+  }
   let count = 0;
   for (const char of str) {
     count += char.match(/[ -~]/) ? 0.5 : 1; // 半角ASCIIは0.5、それ以外は1
