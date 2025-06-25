@@ -38,6 +38,13 @@ const ProfileModule = (props: Props) => {
   const profileConfig: {
     [key: string]: GetCollectionConfig;
   } = {
+    iamge: {
+      collectionName: "b_user_profileImage",
+      conditions: [{ name: "uid", operator: "==", value: props.uid }],
+      public_only: false,
+      order_by: { field: "timestamp", direction: "desc" },
+      limit_num: 1,
+    },
     id: {
       collectionName: "b_user_id",
       conditions: [{ name: "uid", operator: "==", value: props.uid }],
@@ -52,7 +59,7 @@ const ProfileModule = (props: Props) => {
       order_by: { field: "timestamp", direction: "desc" },
       limit_num: 1,
     },
-    iamgeUrl: {
+    image: {
       collectionName: "b_user_profileImage",
       conditions: [{ name: "uid", operator: "==", value: props.uid }],
       public_only: false,
@@ -110,9 +117,8 @@ const ProfileModule = (props: Props) => {
     },
   };
 
-  const getProfileImageUrl = async () => {
-    const res = await getDocuments([profileConfig.iamgeUrl]);
-    console.log("image", res);
+  const getProfileImageUrl = async (): Promise<string> => {
+    const res = await getDocuments([profileConfig.image]);
     return res[0].value;
   };
 
@@ -130,21 +136,48 @@ const ProfileModule = (props: Props) => {
     useSelector((state: RootState) => state.profileImage.url)
   );
   const field = useMemo(
-    () => (
-      console.log("subregions", subregions, countries, prefectures, cities),
-      {
+    () => ({
+      image: {
+        id: "image",
+        fields: [
+          {
+            name: "public",
+            type: "switch" as const,
+            checked: userProfileItem.image?.public ?? false,
+            disabled: false,
+            label: { on: "公開", off: "非公開" },
+          },
+          {
+            name: "value",
+            type: "image",
+            value: userProfileItem.image?.value,
+            label: "プロフィール画像",
+            collectionName: "b_user_profileImage",
+            imageOptions: {
+              width: 800,
+              height: 800,
+              aspectKeep: true,
+              maxDataSize: 250,
+            },
+          },
+        ],
+      },
       id: {
         id: "id",
         fields: [
           {
             name: "public",
-            type: "switch",
-            checked: userProfileItem.id?.public as boolean,
-            value: userProfileItem.id?.public as boolean,
+            type: "switch" as const,
+            checked: userProfileItem.id?.public ?? false,
             disabled: true,
-            label: {on: "公開", off: "非公開"},
+            label: { on: "公開", off: "非公開" },
           },
-          { name: "value", type: "text", value: userProfileItem.id?.value, label: "ユーザーID" },
+          {
+            name: "value",
+            type: "text",
+            value: userProfileItem.id?.value,
+            label: "ユーザーID",
+          },
         ],
       },
       name: {
@@ -152,13 +185,18 @@ const ProfileModule = (props: Props) => {
         fields: [
           {
             name: "public",
-            type: "switch",
-            checked: userProfileItem.name?.public,
-            value: userProfileItem.name?.public as boolean,
+            type: "switch" as const,
+            checked: userProfileItem.name?.public ?? false,
+            //value: userProfileItem.gender?.public ?? false,
             disabled: true,
-            label: {on: "公開", off: "非公開"},
+            label: { on: "公開", off: "非公開" },
           },
-          { name: "value", type: "text", value: userProfileItem.name?.value, label: "ユーザー名" },
+          {
+            name: "value",
+            type: "text",
+            value: userProfileItem.name?.value,
+            label: "ユーザー名",
+          },
         ],
       },
       gender: {
@@ -166,11 +204,11 @@ const ProfileModule = (props: Props) => {
         fields: [
           {
             name: "public",
-            type: "switch",
+            type: "switch" as const,
             checked: userProfileItem.gender?.public,
-            value: userProfileItem.gender?.public ?? false,
+            //value: userProfileItem.gender?.public ?? false,
             disabled: false,
-            label: {on: "公開", off: "非公開"},
+            label: { on: "公開", off: "非公開" },
           },
           {
             name: "value",
@@ -186,11 +224,11 @@ const ProfileModule = (props: Props) => {
         fields: [
           {
             name: "public",
-            type: "switch",
+            type: "switch" as const,
             checked: userProfileItem.birthdate?.public,
-            value: userProfileItem.birthdate?.public,
+            //value: userProfileItem.birthdate?.public,
             disabled: false,
-            label: {on: "公開", off: "非公開"},
+            label: { on: "公開", off: "非公開" },
           },
           {
             name: "value",
@@ -205,11 +243,11 @@ const ProfileModule = (props: Props) => {
         fields: [
           {
             name: "public",
-            type: "switch",
+            type: "switch" as const,
             checked: userProfileItem.residenceRegion?.public,
-            value: userProfileItem.residenceRegion?.public ?? false,
+            //value: userProfileItem.residenceRegion?.public ?? false,
             disabled: false,
-            label: {on: "公開", off: "非公開"},
+            label: { on: "公開", off: "非公開" },
           },
           {
             name: "value",
@@ -225,11 +263,11 @@ const ProfileModule = (props: Props) => {
         fields: [
           {
             name: "public",
-            type: "switch",
+            type: "switch" as const,
             checked: userProfileItem.residenceCountry?.public ?? false,
-            value: userProfileItem.residenceCountry?.public ?? false,
+            //value: userProfileItem.residenceCountry?.public ?? false,
             disabled: false,
-            label: {on: "公開", off: "非公開"},
+            label: { on: "公開", off: "非公開" },
           },
           {
             name: "value",
@@ -250,11 +288,11 @@ const ProfileModule = (props: Props) => {
         fields: [
           {
             name: "public",
-            type: "switch",
+            type: "switch" as const,
             checked: userProfileItem.residencePrefecture?.public,
-            value: userProfileItem.residencePrefecture?.public ?? false,
+            //value: userProfileItem.residencePrefecture?.public ?? false,
             disabled: false,
-            label: {on: "公開", off: "非公開"},
+            label: { on: "公開", off: "非公開" },
           },
           {
             name: "value",
@@ -275,11 +313,11 @@ const ProfileModule = (props: Props) => {
         fields: [
           {
             name: "public",
-            type: "switch",
+            type: "switch" as const,
             checked: userProfileItem.residenceCity?.public,
-            value: userProfileItem.residenceCity?.public ?? false,
+            //value: userProfileItem.residenceCity?.public ?? false,
             disabled: false,
-            label: {on: "公開", off: "非公開"},
+            label: { on: "公開", off: "非公開" },
           },
           {
             name: "value",
@@ -300,11 +338,11 @@ const ProfileModule = (props: Props) => {
         fields: [
           {
             name: "public",
-            type: "switch",
+            type: "switch" as const,
             checked: userProfileItem.introduction?.public as boolean,
-            value: userProfileItem.introduction?.public ?? false,
+            //value: userProfileItem.introduction?.public ?? false,
             disabled: true,
-            label: {on: "公開", off: "非公開"},
+            label: { on: "公開", off: "非公開" },
           },
           {
             name: "value",
@@ -420,6 +458,13 @@ const ProfileModule = (props: Props) => {
   };
 
   const handleSave = {
+    image: async (data: any) => {
+      const value = data["image-value"] || data.value;
+      await save2Collection("id", "b_user_profileImage", {
+        value: value,
+        public: true,
+      });
+    },
     id: async (data: any) => {
       const value = data["id-value"] || data.value;
       const valid = await validate("id", value, false);
@@ -451,7 +496,6 @@ const ProfileModule = (props: Props) => {
     },
     birthdate: async (data: any) => {
       const value = data["birthdate-value"] || data.value;
-      console.log("birthdate", data, value);
       const publicChecked = data["birthdate-public"] || data.public;
       const valid = await validate("birthdate", value, false);
       valid.result &&
@@ -547,6 +591,7 @@ const ProfileModule = (props: Props) => {
   useEffect(() => {
     setUserProfileItem({
       ...userProfileItem,
+      image: getCurrentUserProfile(document.image, ""),
       id: getCurrentUserProfile(document.id, altUserId),
       name: getCurrentUserProfile(document.name, altUserName),
       gender: getCurrentUserProfile(document.gender, 0),
@@ -563,7 +608,6 @@ const ProfileModule = (props: Props) => {
   }, [document]);
 
   useEffect(() => {
-    console.log("document.residenceRegion", document.residenceRegion);
     setSelectOptionItems.country();
   }, [document.residenceRegion]);
 
@@ -577,38 +621,85 @@ const ProfileModule = (props: Props) => {
         <Loading />
       ) : (
         <>
-          <figure className="mb-8">
-            {props.uid && !props.readonly ? (
-              <ImageUploader
-                collectionName="b_user_profileImage"
-                options={{
-                  width: 800,
-                  height: 800,
-                  aspectKeep: true,
-                  maxDataSize: 250,
-                }}
-              />
-            ) : (
-              profileImageUrl !== "" && (
-                <>
-                  <figcaption className="mb-4">プロフィール画像</figcaption>
-                  <Avatar className="w-48 h-48 m-auto">
-                    <AvatarImage
-                      src={profileImageUrl}
-                      alt={`${document.name.value} のプロフィール画像`}
-                    />
-                    <AvatarFallback>
-                      <img
-                        src="/images/noimage.png"
-                        alt="プロフィール画像の代替"
+          <dl className="dl-profile flex md:grid! md:grid-cols-3 md:gap-4">
+            <dt>プロフイール画像</dt>
+            <dd className="col-span-2">
+              {/*props.readonly ? (
+                userProfileItem.image.public ? (
+                  <>
+                    <Avatar className="w-48 h-48 m-auto">
+                      <AvatarImage
+                        src={profileImageUrl}
+                        alt={`${document.name.value} のプロフィール画像`}
                       />
-                    </AvatarFallback>
-                  </Avatar>
+                      <AvatarFallback>
+                        <img
+                          src="/images/noimage.png"
+                          alt="プロフィール画像の代替"
+                        />
+                      </AvatarFallback>
+                    </Avatar>
+                  </>
+                ) : (
+                  <span>非公開</span>
+                )
+              ) : (
+                <EditableFields
+                  field={field.image}
+                  isPublic={userProfileItem.image.public === true}
+                  userLoggedIn={props.uid !== ""}
+                  validate={validate}
+                  defaultEditMode={document.image?.value === undefined}
+                  save={handleSave.image}
+                >
+                  <span>{userProfileItem.image.public ? "公開" : "非公開"}</span>
+                    <Avatar className="w-48 h-48 m-auto">
+                      <AvatarImage
+                        src={profileImageUrl}
+                        alt={`${document.name.value} のプロフィール画像`}
+                      />
+                      <AvatarFallback>
+                        <img
+                          src="/images/noimage.png"
+                          alt="プロフィール画像の代替"
+                        />
+                      </AvatarFallback>
+                    </Avatar>
+                </EditableFields>
+              )*/}
+              
+              {props.uid && !props.readonly ? (
+                <>
+                <span>公開</span>
+                <ImageUploader
+                  collectionName="b_user_profileImage"
+                  options={{
+                    width: 800,
+                    height: 800,
+                    aspectKeep: true,
+                    maxDataSize: 250,
+                  }}
+                />
                 </>
-              )
-            )}
-          </figure>
-          <dl className="dl-profile grid grid-cols-3 gap-4">
+              ) : (
+                profileImageUrl !== "" && (
+                  <>
+                    <Avatar className="w-48 h-48 m-auto">
+                      <AvatarImage
+                        src={profileImageUrl}
+                        alt={`${document.name.value} のプロフィール画像`}
+                      />
+                      <AvatarFallback>
+                        <img
+                          src="/images/noimage.png"
+                          alt="プロフィール画像の代替"
+                        />
+                      </AvatarFallback>
+                    </Avatar>
+                  </>
+                )
+              )}
+            </dd>
             <dt>ユーザーID</dt>
             <dd className="col-span-2">
               {props.readonly ? (

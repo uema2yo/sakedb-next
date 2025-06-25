@@ -12,6 +12,8 @@ import { useDialog } from "@/contexts/DialogContext";
 
 import type { UploadImageOptions } from "@/lib/firebase/uploadImage";
 import Confirm from "@/components/Dialog/Confirm";
+import { Input } from "../ui/input";
+import { Button } from "../ui/button";
 interface Props {
   collectionName: string;
   options: UploadImageOptions
@@ -55,8 +57,7 @@ export default function ImageUploader(props: Props) {
     if (!saved) {
       try {
         const url = await uploadImageAsWebP(file, props.options);
-        console.log("url",url)
-        dispatch(setProfileImageUrl(url)); // ← Redux に保存！
+        dispatch(setProfileImageUrl(url));
         await addDocument(props.collectionName,  {value: url, public: true});
         setSaved(true);
       } catch (err) {
@@ -68,6 +69,11 @@ export default function ImageUploader(props: Props) {
       setSaved(false);
     }
   };
+
+  const handleCancel = () => {
+    setPreview(null);
+    setImage(null);
+  }
 
   const deleteImage = async () => {
     addDocument(props.collectionName, { deleted: true });
@@ -84,6 +90,10 @@ export default function ImageUploader(props: Props) {
     ));
   };
 
+  const handleClick = () => {
+    inputRef.current?.click();
+  } 
+
   useEffect(() => {
     (async () => {
       const res = await getImage();
@@ -93,32 +103,55 @@ export default function ImageUploader(props: Props) {
 
   return (
     <div>
-      <input type="file" accept="image/*" onChange={handleFileChange} ref={inputRef} />
+      <Input
+        type="file"
+        accept="image/*"
+        onChange={handleFileChange}
+        ref={inputRef}
+        className="hidden"
+      />
       {preview ? (
         <div>
           <img src={preview} alt="プレビュー" width={160} />
-          {file?.name &&
-          <p>ファイル名: {file?.name}</p>
-          }
-          {!saved ?
-          <button onClick={handleUpload} disabled={uploading}>
-            {uploading ? "アップロード中..." : "保存する"}
-          </button>
-          :
-          <button onClick={handleDelete}>
-            削除する
-          </button>          
-          }
+
+          {file?.name && <p>ファイル名: {file?.name}</p>}
+          {!saved ? (
+            <>
+              <Button
+                variant="primary"
+                size="sm"
+                onClick={handleUpload}
+                disabled={uploading}
+              >
+                {uploading ? "アップロード中..." : "保存する"}
+              </Button>
+              {!uploading && (
+                <Button variant="cancel" size="sm" onClick={handleCancel}>
+                  取り消す
+                </Button>
+              )}
+            </>
+          ) : (
+            <Button variant="destructive" size="sm" onClick={handleDelete}>
+              削除する
+            </Button>
+          )}
         </div>
-      ) :
-      image && (
-        <div>
-          <img src={image} alt={`のプロフィール画像`} width={160} />
-          <button onClick={handleDelete}>
-            削除する
-          </button>
-        </div>
+      ) : (
+        image && (
+          <>
+          <div>
+            <img src={image} alt={`のプロフィール画像`} width={160} />
+            <Button variant="destructive" onClick={handleDelete}>
+              削除する
+            </Button>
+          </div>
+          </>
+        )
       )}
+      <Button type="button" variant="primary" onClick={handleClick}>
+        ファイルを選択
+      </Button>
 
     </div>
   );

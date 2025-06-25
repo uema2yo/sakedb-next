@@ -20,8 +20,10 @@
     --popover: 0 0% 100%;
     --popover-foreground: 0 0% 3.9%;
     --primary: 0 0% 9%;
-    --cancel: 0 0% 66%;
-    --cancel-foreground: 0 0% 100%;
+    /*--cancel: 0 0% 66%; */
+    --cancel: 0 0% 100%;
+    /*--cancel-foreground: 0 0% 100%;*/
+    --cancel-foreground: 0 0% 50%;
     --primary-foreground: 0 0% 100%;
     --secondary: 0 0% 96.1%;
     --secondary-foreground: 0 0% 9%;
@@ -99,6 +101,7 @@
   --color-destructive-foreground: hsl(var(--destructive-foreground));
   --color-input: hsl(var(--input));
   --color-foreground: hsl(var(--foreground));
+  --color-background: hsl(var(--background));
 }
 
 /* Custom Properties */

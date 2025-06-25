@@ -19,7 +19,7 @@ export const metadata = {
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="ja" className="summer">
-      <body className={inter.className}>
+      <body className={`${inter.className} pb-[120px]`}>
         <Providers>
           <LoginProvider>
             <ClientLayoutInner>{children}</ClientLayoutInner>
